@@ -11,7 +11,7 @@ dokunmaz; her dosyanın yanına `<isim>-optimized.mkv` üretir.
 Jellyfin Dashboard > Plugins > Repositories > Add:
 
 ```
-https://raw.githubusercontent.com/kayah/Jellyfin.Plugin.PreTranscode/main/manifest.json
+https://raw.githubusercontent.com/kayahasan/Jellyfin.Plugin.PreTranscode/main/manifest.json
 ```
 
 Sonra Plugins > Catalog > PreTranscode > Install
@@ -20,7 +20,7 @@ Sonra Plugins > Catalog > PreTranscode > Install
 
 ```bash
 # Release'dan zip indir
-wget https://github.com/kayah/Jellyfin.Plugin.PreTranscode/releases/latest/download/PreTranscode_*.zip
+wget https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/latest/download/PreTranscode_*.zip
 
 # Plugin klasörüne çıkar
 mkdir -p /var/lib/jellyfin/plugins/PreTranscode
