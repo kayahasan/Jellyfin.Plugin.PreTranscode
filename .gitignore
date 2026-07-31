@@ -1,0 +1,17 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+
+## IDE
+.vs/
+.vscode/
+*.swp
+*.swo
+
+## Build artifacts
+*.dll
+*.pdb
+*.zip

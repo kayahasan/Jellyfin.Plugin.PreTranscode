@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>PreTranscode Ayarları</title>
+</head>
+<body>
+<div id="PreTranscodeConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+    <div data-role="content">
+        <div class="content-primary">
+
+            <div style="display:flex;align-items:center;gap:1.2em;margin-bottom:2em;">
+                <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#e50914,#b20710);display:flex;align-items:center;justify-content:center;font-size:1.6em;color:#fff;flex-shrink:0;">&#9654;</div>
+                <div>
+                    <h2 style="margin:0 0 .2em;">PreTranscode</h2>
+                    <p style="margin:0;color:#999;font-size:.9em;">Medya dosyalarınızı hedef codec ve kaliteye dönüştürün</p>
+                </div>
+            </div>
+
+            <form id="PreTranscodeConfigForm">
+
+                <!-- Encoder -->
+                <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:1.5em;margin-bottom:1em;">
+                    <h3 style="margin:0 0 .3em;font-size:1em;display:flex;align-items:center;gap:.4em;">&#9881; Encoder Ayarları</h3>
+                    <p style="margin:0 0 1.2em;color:#777;font-size:.8em;">Donanım hızlandırma ve hedef codec seçimleri</p>
+
+                    <div style="display:flex;gap:1em;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:220px;">
+                            <div class="selectContainer">
+                                <select is="emby-select" id="HardwareAcceleration" label="Donanım Hızlandırma">
+                                    <option value="None">Yok (yazılım)</option>
+                                    <option value="Vaapi">VAAPI (Intel/AMD)</option>
+                                    <option value="Qsv">Intel QSV</option>
+                                    <option value="Nvenc">NVIDIA NVENC</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:220px;">
+                            <div class="selectContainer">
+                                <select is="emby-select" id="TargetVideoCodec" label="Hedef Video Codec">
+                                    <option value="hevc">HEVC (H.265)</option>
+                                    <option value="h264">H.264</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="RenderDeviceField" style="margin-top:1em;">
+                        <div class="inputContainer">
+                            <input is="emby-input" type="text" id="RenderDevicePath" label="Render Cihazı Yolu" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kalite -->
+                <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:1.5em;margin-bottom:1em;">
+                    <h3 style="margin:0 0 .3em;font-size:1em;display:flex;align-items:center;gap:.4em;">&#9733; Kalite &amp; Çözünürlük</h3>
+                    <p style="margin:0 0 1.2em;color:#777;font-size:.8em;">Çıktı kalitesi ve maksimum çözünürlük</p>
+
+                    <div style="display:flex;gap:1em;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:220px;">
+                            <div class="inputContainer">
+                                <input is="emby-input" type="number" id="Quality" label="Kalite (CRF/QP) — düşük = daha iyi" />
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:220px;">
+                            <div class="inputContainer">
+                                <input is="emby-input" type="number" id="MaxWidth" label="Maksimum Genişlik (0 = değiştirme)" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtreler -->
+                <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:1.5em;margin-bottom:1em;">
+                    <h3 style="margin:0 0 .3em;font-size:1em;display:flex;align-items:center;gap:.4em;">&#9776; Filtreler &amp; Performans</h3>
+                    <p style="margin:0 0 1.2em;color:#777;font-size:.8em;">Hangi dosyaların işleneceği</p>
+
+                    <div style="display:flex;gap:1em;flex-wrap:wrap;">
+                        <div style="flex:1;min-width:220px;">
+                            <div class="inputContainer">
+                                <input is="emby-input" type="number" id="MinimumFileSizeMb" label="Minimum Dosya Boyutu (MB)" />
+                            </div>
+                        </div>
+                        <div style="flex:1;min-width:220px;">
+                            <div class="inputContainer">
+                                <input is="emby-input" type="number" id="MaxConcurrentJobs" label="Eşzamanlı İş Sayısı" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seçenekler -->
+                <div style="background:#1a1a2e;border:1px solid #2a2a3e;border-radius:10px;padding:1.5em;margin-bottom:1em;">
+                    <h3 style="margin:0 0 1em;font-size:1em;display:flex;align-items:center;gap:.4em;">&#9881; Seçenekler</h3>
+
+                    <div class="checkboxContainer" style="margin-bottom:.8em;">
+                        <label style="display:flex;align-items:center;gap:.5em;cursor:pointer;">
+                            <input is="emby-checkbox" type="checkbox" id="SkipIfAlreadyTargetCodec" />
+                            <span>Hedef codec'teki dosyaları atla</span>
+                        </label>
+                        <div style="font-size:.78em;color:#777;margin-top:.2em;margin-left:2em;">Zaten hedef codec'te olan dosyalar tekrar kodlanmaz</div>
+                    </div>
+
+                    <div class="checkboxContainer" style="margin-bottom:0;">
+                        <label style="display:flex;align-items:center;gap:.5em;cursor:pointer;">
+                            <input is="emby-checkbox" type="checkbox" id="ReplaceOriginal" />
+                            <span style="color:#ff6b6b;">Orijinali değiştir (⚠ geri alınamaz)</span>
+                        </label>
+                        <div style="font-size:.78em;color:#777;margin-top:.2em;margin-left:2em;">Orijinal dosya silinip yerine optimize edilmiş dosya konulur</div>
+                    </div>
+                </div>
+
+                <!-- Kaydet -->
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:1em 0;border-top:1px solid #2a2a3e;">
+                    <div id="PtStatus" style="font-size:.85em;color:#555;"></div>
+                    <button is="emby-button" type="submit" class="raised button-submit block" style="max-width:200px;">
+                        <span>Kaydet</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    (function() {
+        var pluginId = "b3a1c9e4-6f2d-4a8b-9c3e-2d1f5a7b8c90";
+
+        function updateRenderDevice(view) {
+            var hw = view.querySelector('#HardwareAcceleration').value;
+            view.querySelector('#RenderDeviceField').style.display = (hw === 'Vaapi' || hw === 'Qsv') ? '' : 'none';
+        }
+
+        function loadConfig(view) {
+            Dashboard.showLoadingMsg();
+            ApiClient.getPluginConfiguration(pluginId).then(function(config) {
+                view.querySelector('#HardwareAcceleration').value = config.HardwareAcceleration;
+                view.querySelector('#RenderDevicePath').value = config.RenderDevicePath;
+                view.querySelector('#TargetVideoCodec').value = config.TargetVideoCodec;
+                view.querySelector('#Quality').value = config.Quality;
+                view.querySelector('#MaxWidth').value = config.MaxWidth;
+                view.querySelector('#MinimumFileSizeMb').value = config.MinimumFileSizeMb;
+                view.querySelector('#MaxConcurrentJobs').value = config.MaxConcurrentJobs;
+                view.querySelector('#SkipIfAlreadyTargetCodec').checked = config.SkipIfAlreadyTargetCodec;
+                view.querySelector('#ReplaceOriginal').checked = config.ReplaceOriginal;
+                updateRenderDevice(view);
+                Dashboard.hideLoadingMsg();
+            });
+        }
+
+        document.querySelector('#PreTranscodeConfigPage').addEventListener('pageshow', function() {
+            loadConfig(this);
+        });
+
+        document.querySelector('#HardwareAcceleration').addEventListener('change', function() {
+            updateRenderDevice(this.closest('#PreTranscodeConfigPage'));
+        });
+
+        document.querySelector('#PreTranscodeConfigForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var view = this.closest('#PreTranscodeConfigPage');
+            Dashboard.showLoadingMsg();
+            ApiClient.getPluginConfiguration(pluginId).then(function(config) {
+                config.HardwareAcceleration = view.querySelector('#HardwareAcceleration').value;
+                config.RenderDevicePath = view.querySelector('#RenderDevicePath').value;
+                config.TargetVideoCodec = view.querySelector('#TargetVideoCodec').value;
+                config.Quality = parseInt(view.querySelector('#Quality').value, 10);
+                config.MaxWidth = parseInt(view.querySelector('#MaxWidth').value, 10);
+                config.MinimumFileSizeMb = parseInt(view.querySelector('#MinimumFileSizeMb').value, 10);
+                config.MaxConcurrentJobs = parseInt(view.querySelector('#MaxConcurrentJobs').value, 10);
+                config.SkipIfAlreadyTargetCodec = view.querySelector('#SkipIfAlreadyTargetCodec').checked;
+                config.ReplaceOriginal = view.querySelector('#ReplaceOriginal').checked;
+                ApiClient.updatePluginConfiguration(pluginId, config).then(function(result) {
+                    Dashboard.processPluginConfigurationUpdateResult(result);
+                    var s = view.querySelector('#PtStatus');
+                    s.innerHTML = '&#10004; Kaydedildi';
+                    s.style.color = '#30d158';
+                    setTimeout(function() { s.innerHTML = ''; s.style.color = '#555'; }, 3000);
+                });
+            });
+            return false;
+        });
+    })();
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish -c Release -o publish --no-build
+
+      - name: Package
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          zip -j "PreTranscode_${VERSION}.zip" publish/Jellyfin.Plugin.PreTranscode.dll
+
+      - name: Checksum
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sha256sum "PreTranscode_${VERSION}.zip" | awk '{print $1}' > checksum.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: PreTranscode_${{ github.ref_name }}.zip
+          body_path: checksum.txt
+          generate_release_notes: true
+
+      - name: Update Manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          CHECKSUM=$(cat checksum.txt)
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          PLUGIN_NAME="PreTranscode"
+          ZIP_NAME="${PLUGIN_NAME}_${VERSION}.zip"
+          SOURCE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${ZIP_NAME}"
+
+          # Read changelog from release notes
+          CHANGELOG=$(gh release view "${GITHUB_REF_NAME}" --json body --jq '.body' | head -c 10000)
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="Version ${VERSION} release"
+          fi
+
+          # Update manifest.json
+          jq --arg version "$VERSION" \
+             --arg changelog "$CHANGELOG" \
+             --arg targetAbi "10.11.0.0" \
+             --arg sourceUrl "$SOURCE_URL" \
+             --arg checksum "$CHECKSUM" \
+             --arg timestamp "$TIMESTAMP" \
+             '.[0].versions |= . + [{
+               version: $version,
+               changelog: $changelog,
+               targetAbi: $targetAbi,
+               sourceUrl: $sourceUrl,
+               checksum: $checksum,
+               timestamp: $timestamp
+             }]' manifest.json > manifest_new.json
+
+          # Keep only last 10 versions to prevent manifest bloat
+          jq '.[0].versions |= [limit(10; .[]) | .[]]' manifest_new.json > manifest_final.json 2>/dev/null || mv manifest_new.json manifest_final.json
+
+          mv manifest_final.json manifest.json
+
+          git fetch origin main
+          git checkout -B manifest-update origin/main || git checkout -b manifest-update
+          git add manifest.json
+          git diff --cached --quiet || git commit -m "chore: update manifest for ${VERSION}"
+          git push -u origin manifest-update --force || true
+          gh pr create \
+            --base main \
+            --title "Update manifest for ${VERSION}" \
+            --body "Auto-generated manifest update for version ${VERSION}" \
+            --head manifest-update || true

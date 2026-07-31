@@ -1,0 +1,14 @@
+name: "PreTranscode"
+guid: "b3a1c9e4-6f2d-4a8b-9c3e-2d1f5a7b8c90"
+version: "1.0.0.0"
+targetAbi: "10.11.0.0"
+framework: "net9.0"
+owner: "self-hosted"
+overview: "Kütüphaneyi arka planda hedef codec/kaliteye göre önceden kodlar."
+description: >
+  Jellyfin'de canlı transcoding yerine, kütüphanedeki dosyaları arka planda
+  bir kez hedef codec'e (örn. HEVC/VAAPI) kodlayarak Direct Play oranını artırır.
+category: "Library"
+artifacts:
+  - "Jellyfin.Plugin.PreTranscode.dll"
+changelog: "İlk sürüm."

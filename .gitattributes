@@ -1,0 +1,15 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Preserve CRLF for Windows batch files
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Force LF for source code
+*.cs text eol=lf
+*.csproj text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.html text eol=lf
