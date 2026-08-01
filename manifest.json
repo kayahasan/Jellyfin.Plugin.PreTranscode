@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.8",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.8/PreTranscode_1.0.0.8.zip",
+        "checksum": "0504CB62D8282C9C56506F337F518173",
+        "changelog": "Fix VAAPI h264 encoding - removed incorrect software fallback, h264_vaapi works with 10-bit format conversion",
+        "timestamp": "2025-08-01T04:30:00Z"
+      },
+      {
         "version": "1.0.0.7",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.7/PreTranscode_1.0.0.7.zip",
@@ -39,14 +47,7 @@
         "changelog": "Fix CUDA/NVENC encoding: add hwdownload+format=nv12 filter chain",
         "timestamp": "2025-08-01T03:30:00Z"
       },
-      {
-        "version": "1.0.0.3",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.3/PreTranscode_1.0.0.3.zip",
-        "checksum": "86D04EB6EDEB225D3E3C5F28ABBAE898",
-        "changelog": "Fix plugin load error (.NET 10 dependency conflict), add TR/EN description, fix settings panel, improve UI stability",
-        "timestamp": "2025-08-01T02:50:00Z"
-      },
+
 
     ]
   }
