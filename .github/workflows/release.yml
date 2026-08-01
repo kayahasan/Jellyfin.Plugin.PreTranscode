@@ -89,6 +89,8 @@ jobs:
 
           git fetch origin main
           git checkout -B manifest-update origin/main || git checkout -b manifest-update
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add manifest.json
           git diff --cached --quiet || git commit -m "chore: update manifest for ${VERSION}"
           git push -u origin manifest-update --force || true
@@ -97,3 +99,4 @@ jobs:
             --title "Update manifest for ${VERSION}" \
             --body "Auto-generated manifest update for version ${VERSION}" \
             --head manifest-update || true
+          gh pr merge --auto --delete-branch --squash "Update manifest for ${VERSION}" || true

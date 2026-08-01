@@ -335,6 +335,8 @@ public class EncoderService
         }
         else if (config.HardwareAcceleration == HwAccelType.Nvenc)
         {
+            // CUDA decode -> NVENC encode: hwdownload + format=nv12 gerekli
+            videoFilters.Append("hwdownload,format=nv12,");
             if (config.MaxWidth > 0)
             {
                 videoFilters.Append($"scale=w='min({config.MaxWidth},iw)':h=-2,");
