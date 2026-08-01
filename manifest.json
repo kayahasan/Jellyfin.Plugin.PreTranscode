@@ -10,21 +10,21 @@
       {
         "version": "1.0.0.3",
         "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.3/Jellyfin.Plugin.PreTranscode.1.0.0.3.zip",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.3/PreTranscode_1.0.0.3.zip",
         "changelog": "Fix plugin load error (.NET 10 dependency conflict), add TR/EN description, fix settings panel, improve UI stability",
         "timestamp": "2025-08-01T02:50:00Z"
       },
       {
         "version": "1.0.0.2",
         "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.2/Jellyfin.Plugin.PreTranscode.1.0.0.2.zip",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.2/PreTranscode_1.0.0.2.zip",
         "changelog": "Cross-platform FFmpeg fixes, real-time progress tracking, native Jellyfin UI",
         "timestamp": "2025-07-30T00:00:00Z"
       },
       {
         "version": "1.0.0.1",
         "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.1/Jellyfin.Plugin.PreTranscode.1.0.0.1.zip",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.1/PreTranscode_1.0.0.1.zip",
         "changelog": "Initial release - library scanning, selective encoding, scheduled tasks",
         "timestamp": "2025-07-28T00:00:00Z"
       }

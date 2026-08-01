@@ -44,7 +44,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: PreTranscode_${{ github.ref_name }}.zip
+          files: PreTranscode_${{ github.ref_name #v }}.zip
           body_path: checksum.txt
           generate_release_notes: true
 

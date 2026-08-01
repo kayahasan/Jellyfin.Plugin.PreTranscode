@@ -1,12 +1,14 @@
 # Jellyfin PreTranscode Plugin
 
-Kütüphaneyi arka planda, sen tanımladığın hedef codec/kalite/GPU ayarına göre
-önceden kodlayan bir Jellyfin scheduled task plugin'i. Orijinal dosyalara
-dokunmaz; her dosyanın yanına `<isim>-optimized.mkv` üretir.
+Kutuphanedeki uyumsuz video dosyalarini tarar, secerek veya zamanli gorev ile
+hedef codec'e (HEVC/H.264) yeniden kodlayan Jellyfin plugin'i. VAAPI, Intel QSV
+ve NVIDIA NVENC donanim hizlandirmasini destekler.
+
+Orijinal dosyalara dokunmaz; her dosyanin yanina `<isim>-optimized.mkv` uretir.
 
 ## Kurulum
 
-### Yöntem 1: Plugin Repository (Önerilen)
+### Yontem 1: Plugin Repository (Onerilen)
 
 Jellyfin Dashboard > Plugins > Repositories > Add:
 
@@ -16,24 +18,35 @@ https://raw.githubusercontent.com/kayahasan/Jellyfin.Plugin.PreTranscode/main/ma
 
 Sonra Plugins > Catalog > PreTranscode > Install
 
-### Yöntem 2: Manuel
+### Yontem 2: Manuel
 
 ```bash
 # Release'dan zip indir
-wget https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/latest/download/PreTranscode_*.zip
+wget https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/latest/download/Jellyfin.Plugin.PreTranscode.*.zip
 
-# Plugin klasörüne çıkar
-mkdir -p /var/lib/jellyfin/plugins/PreTranscode
-unzip PreTranscode_*.zip -d /var/lib/jellyfin/plugins/PreTranscode/
+# Plugin klasorune cikar
+mkdir -p /var/lib/jellyfin/plugins/Jellyfin.Plugin.PreTranscode
+unzip Jellyfin.Plugin.PreTranscode.*.zip -d /var/lib/jellyfin/plugins/Jellyfin.Plugin.PreTranscode/
 
-# Jellyfin'i yeniden başlat
+# Jellyfin'i yeniden baslat
 systemctl restart jellyfin
 ```
 
-Windows için:
+Windows icin:
 ```
-C:\Users\{Kullanici}\AppData\Local\jellyfin\plugins\PreTranscode\
+C:\ProgramData\Jellyfin\Server\plugins\Jellyfin.Plugin.PreTranscode\
 ```
+
+## Ozellikler
+
+- **Kutuphane taramasi** — uyumsuz dosyalar otomatik tespit edilir
+- **Gorsel arayuz** — film ve diziler poster ile listelenir, sezon/bolum bazli gruplama
+- **Donanim hizlandirma** — VAAPI (Intel/AMD), QSV (Intel), NVENC (NVIDIA)
+- **Canli ilerleme takibi** — dosya boyutu bazli yuzde gosterimi
+- **Zamanli gorev** — arka planda otomatik kodlama
+- **Cross-platform** — Windows ve Linux (Proxmox LXC dahil)
+- **10-bit kaynak destegi** — otomatik format donusumu (p010 -> nv12)
+- **Izin guvenligi** — yazma testi ve Unix permission kopyalama
 
 ## Derleme
 
@@ -43,37 +56,50 @@ dotnet restore
 dotnet build -c Release
 ```
 
-Çıktı: `bin/Release/net9.0/Jellyfin.Plugin.PreTranscode.dll`
+Cikti: `bin/Release/net9.0/Jellyfin.Plugin.PreTranscode.dll`
 
 ## Release Yapma
 
 ```bash
-# Versiyonu .csproj'de güncelle
-# <Version>1.0.0.1</Version>
+# Versiyonu .csproj'de guncelle
+# <Version>1.0.0.3</Version>
 
-# Tag oluştur ve push et
-git tag v1.0.0.1
-git push origin v1.0.0.1
+# manifest.json'a yeni versiyon entry'si ekle
+# Commit, tag ve push
+git add -A && git commit -m "bump: version X.X.X.X - aciklama"
+git tag vX.X.X.X
+git push origin main && git push origin vX.X.X.X
 ```
 
 GitHub Actions otomatik olarak:
 1. Plugin'i build eder
-2. ZIP oluşturur
-3. GitHub Release açar
-4. `manifest.json`'ü günceller
+2. ZIP olusturur
+3. GitHub Release acar
 
-## Yapılandırma
+## Yapilandirma
 
-Dashboard > Plugins > PreTranscode'dan ayarları yapılandır,
-sol menüden "PreTranscode Kütüphane" sayfasını aç, işlemek istediğin
-film/dizileri seçip "Seçilenleri Kodla"ya bas.
+Dashboard > Plugins > PreTranscode'dan ayarlari yapilandir,
+sol menuden "PreTranscode" sayfasini ac, islemek istedigim
+film/dizileri secip "Secilenleri Kodla"ya bas.
 
-## Bilinen sınırlamalar
+## Uninstall
 
-1. **Alternate version otomatik bağlama yok.** Şu an yalnızca dosyayı
-   üretiyor; Jellyfin'in "Merge Versions" mekanizmasına otomatik kaydını
-   ayrıca yazman gerekir.
-2. **HDR/tonemap desteği yok.** 10-bit HDR kaynaklar için `-vf` filtresine
-   tonemap eklenmesi gerekir.
-3. **Progress/iptal** temel seviyede; büyük kütüphanelerde dosya bazlı
-   ilerleme eklemek daha iyi UX verir.
+Windows'ta DLL process tarafindan kullanildigi icin otomatik silme calismaz.
+Jellyfin'i durdurup klasoru manuel silin:
+
+```powershell
+Stop-Process -Name jellyfin -Force
+rmdir /s /q "C:\ProgramData\Jellyfin\Server\plugins\Jellyfin.Plugin.PreTranscode"
+```
+
+Linux'ta:
+```bash
+systemctl stop jellyfin
+rm -rf /var/lib/jellyfin/plugins/Jellyfin.Plugin.PreTranscode
+```
+
+## Sistem gereksinimleri
+
+- Jellyfin 10.11.x (.NET 9)
+- FFmpeg (VAAPI/QSV/NVENC destegi ile)
+- Donanim hizlandirma icin uygun GPU ve suruculer
