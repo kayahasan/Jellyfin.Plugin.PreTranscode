@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.9",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.9/PreTranscode_1.0.0.9.zip",
+        "checksum": "BAE7C9884074D5E600C6DBA3C2EB66C1",
+        "changelog": "Fix broken UI - missing closing brace in renderJobs() caused fatal JS parse error",
+        "timestamp": "2026-08-01T16:35:00Z"
+      },
+      {
         "version": "1.0.0.8",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.8/PreTranscode_1.0.0.8.zip",
