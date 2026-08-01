@@ -7,7 +7,8 @@ public enum HwAccelType
     None,
     Vaapi,
     Qsv,
-    Nvenc
+    Nvenc,
+    Amf
 }
 
 public class PluginConfiguration : BasePluginConfiguration

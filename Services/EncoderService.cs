@@ -244,7 +244,8 @@ public class EncoderService
         var result = await RunFfmpeg(ffmpegPath, args, sourcePath, outputPath, cancellationToken);
 
         // HW encode basarisiz olduysa ve VAAPI/QSV kullaniliyorsa, software encode ile tekrar dene
-        if (!result && config.HardwareAcceleration != HwAccelType.None && config.HardwareAcceleration != HwAccelType.Nvenc)
+        // AMF ve NVENC zaten codec'i destekliyor, fallback gerekmez
+        if (!result && (config.HardwareAcceleration == HwAccelType.Vaapi || config.HardwareAcceleration == HwAccelType.Qsv))
         {
             _logger.LogWarning("PreTranscode: {Accel} encode basarisiz, software encode ile tekrar deneniyor", config.HardwareAcceleration);
             var fallbackConfig = new PluginConfiguration
@@ -336,6 +337,9 @@ public class EncoderService
             case HwAccelType.Nvenc:
                 sb.Append("-hwaccel cuda -hwaccel_device 0 -hwaccel_output_format cuda ");
                 break;
+            case HwAccelType.Amf:
+                // AMF: CPU decode, GPU encode - hwaccel gerekmez
+                break;
         }
 
         // Input path - Windows UNC icin file: prefix
@@ -371,6 +375,18 @@ public class EncoderService
         {
             // CUDA decode -> NVENC encode: hwdownload + format=nv12 gerekli
             videoFilters.Append("hwdownload,format=nv12,");
+            if (config.MaxWidth > 0)
+            {
+                videoFilters.Append($"scale=w='min({config.MaxWidth},iw)':h=-2,");
+            }
+        }
+        else if (config.HardwareAcceleration == HwAccelType.Amf)
+        {
+            // AMF: CPU decode -> GPU encode, 10-bit kaynaklari nv12'ye donustur
+            if (Is10BitFormat(sourcePixFmt))
+            {
+                videoFilters.Append("format=nv12,");
+            }
             if (config.MaxWidth > 0)
             {
                 videoFilters.Append($"scale=w='min({config.MaxWidth},iw)':h=-2,");
@@ -437,15 +453,19 @@ public class EncoderService
             HwAccelType.Vaapi => "_vaapi",
             HwAccelType.Qsv => "_qsv",
             HwAccelType.Nvenc => "_nvenc",
+            HwAccelType.Amf => "_amf",
             _ => string.Empty
         };
 
         var baseCodec = config.TargetVideoCodec == "h264" ? "h264" : "hevc";
         var encoder = baseCodec + codecSuffix;
 
-        return config.HardwareAcceleration == HwAccelType.None
-            ? $"-c:v lib{(baseCodec == "hevc" ? "x265" : "x264")} -preset medium -crf {config.Quality}"
-            : $"-c:v {encoder} -qp {config.Quality}";
+        return config.HardwareAcceleration switch
+        {
+            HwAccelType.None => $"-c:v lib{(baseCodec == "hevc" ? "x265" : "x264")} -preset medium -crf {config.Quality}",
+            HwAccelType.Amf => $"-c:v {encoder} -rc_mode vq -qp {config.Quality}",
+            _ => $"-c:v {encoder} -qp {config.Quality}"
+        };
     }
 
     private static string TailLines(string text, int count)
