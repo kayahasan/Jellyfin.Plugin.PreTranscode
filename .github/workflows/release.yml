@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          sha256sum "PreTranscode_${VERSION}.zip" | awk '{print $1}' > checksum.txt
+          md5sum "PreTranscode_${VERSION}.zip" | awk '{print toupper($1)}' > checksum.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
