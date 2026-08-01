@@ -197,6 +197,13 @@ return na.CompareTo(nb);
         return Ok(new { queued = request.ItemIds.Count });
     }
 
+    [HttpPost("Cancel/{itemId}")]
+    public ActionResult Cancel([FromBody] Guid itemId)
+    {
+        _jobQueueService.CancelJob(itemId);
+        return Ok(new { cancelled = true });
+    }
+
     private bool IsAlreadyTargetCodec(BaseItem item, Configuration.PluginConfiguration config)
     {
         var videoStream = item.GetMediaStreams()?.FirstOrDefault(s => s.Type == MediaStreamType.Video);

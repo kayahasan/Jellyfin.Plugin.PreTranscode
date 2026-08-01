@@ -127,6 +127,7 @@ var statusIcon,statusColor,statusText;
 if(j.Status==='Running'){statusIcon='&#9654;';statusColor='#30d158';statusText='Kodlaniyor...';}
 else if(j.Status==='Queued'){statusIcon='&#9203;';statusColor='#f5c542';statusText='Kuyrukta';}
 else if(j.Status==='Completed'){statusIcon='&#10004;';statusColor='#30d158';statusText='Tamamlandi';}
+else if(j.Status==='Cancelled'){statusIcon='&#9209;';statusColor='#f5c542';statusText=j.Error||'Iptal Edildi';}
 else{statusIcon='&#10006;';statusColor='#ff6b6b';statusText=j.Error||'Hata';}
 
 var pct=Math.round(j.ProgressPercent||0);
@@ -135,12 +136,18 @@ var srcMb=j.SourceSizeMb||0;
 var sizeStr=outMb>0?(outMb>=1024?(outMb/1024).toFixed(2)+'GB':Math.round(outMb)+'MB'):'0MB';
 var srcStr=srcMb>0?(srcMb>=1024?(srcMb/1024).toFixed(2)+'GB':Math.round(srcMb)+'MB'):'?';
 
+// Cancel button
+var cancelBtn='';
+if(j.Status==='Running'){
+cancelBtn='<button onclick="cancelJob(\''+j.ItemId+'\')" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">Iptal</button>';
+}
+
 html+='<div style="display:flex;align-items:center;gap:.5em;padding:.5em 0;border-bottom:1px solid rgba(255,255,255,.04);">';
 html+='<span style="color:'+statusColor+';font-size:1.1em;width:20px;text-align:center;">'+statusIcon+'</span>';
 html+='<div style="flex:1;">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;">';
 html+='<span style="font-size:.85em;color:#eee;">'+esc(j.Name)+'</span>';
-html+='<span style="font-size:.8em;color:#ccc;font-weight:600;">'+pct+'%</span>';
+html+='<span style="font-size:.8em;color:#ccc;font-weight:600;">'+pct+'%</span>'+cancelBtn;
 html+='</div>';
 // Progress bar
 html+='<div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:.35em;overflow:hidden;">';
@@ -158,6 +165,8 @@ p.innerHTML=html;
 
 // Keep polling if there are running/queued jobs
 var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
+// Remove old completed/failed/cancelled jobs after delay
+if(hasActive){var t=setTimeout(function(){var p2=document.getElementById('JobPanel');var oldJobs=p2.querySelectorAll('[data-status="Completed"],[data-status="Failed"],[data-status="Cancelled"]');oldJobs.forEach(function(el){el.remove();});},10000);
 if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;setTimeout(function(){document.getElementById('JobPanel').style.display='none';},5000);}
 }
 
@@ -182,6 +191,10 @@ document.getElementById('TabLibrary').onclick=function(){showTab('l');};
 document.getElementById('TabSettings').onclick=function(){showTab('s');};
 
 function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
+function cancelJob(id){
+if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
+ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+id)});
+}
 function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
 function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
 function ucnt(){document.getElementById('SelectedCount').textContent=sel.size>0?sel.size+' secili':'';}

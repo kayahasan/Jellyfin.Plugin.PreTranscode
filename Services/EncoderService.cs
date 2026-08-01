@@ -243,9 +243,9 @@ public class EncoderService
 
         var result = await RunFfmpeg(ffmpegPath, args, sourcePath, outputPath, cancellationToken);
 
-        // HW encode basarisiz olduysa ve VAAPI/QSV kullaniliyorsa, software encode ile tekrar dene
-        // AMF ve NVENC zaten codec'i destekliyor, fallback gerekmez
-        if (!result && (config.HardwareAcceleration == HwAccelType.Vaapi || config.HardwareAcceleration == HwAccelType.Qsv))
+        // HW encode basarisiz olduysa, software encode ile tekrar dene
+        // VAAPI/QSV: codec destek problemi, AMF: runtime kütüphane eksik (LXC)
+        if (!result && config.HardwareAcceleration != HwAccelType.None && config.HardwareAcceleration != HwAccelType.Nvenc)
         {
             _logger.LogWarning("PreTranscode: {Accel} encode basarisiz, software encode ile tekrar deneniyor", config.HardwareAcceleration);
             var fallbackConfig = new PluginConfiguration

@@ -13,7 +13,8 @@ public enum JobStatus
     Queued,
     Running,
     Completed,
-    Failed
+    Failed,
+    Cancelled
 }
 
 public class JobInfo
@@ -26,6 +27,7 @@ public class JobInfo
     public double SourceSizeMb { get; set; }
     public double OutputSizeMb { get; set; }
     public string? OutputPath { get; set; }
+    public bool IsCancelling { get; set; }
 }
 
 /// <summary>
@@ -55,6 +57,15 @@ public class JobQueueService : IDisposable
     }
 
     public System.Collections.Generic.IReadOnlyCollection<JobInfo> GetAllJobs() => (System.Collections.Generic.IReadOnlyCollection<JobInfo>)_jobs.Values;
+
+    public void CancelJob(Guid itemId)
+    {
+        if (_jobs.TryGetValue(itemId, out var job) && job.Status == JobStatus.Running)
+        {
+            job.IsCancelling = true;
+            _logger.LogInformation("PreTranscode: iptal istendi {Name} ({Progress}%)", job.Name, job.ProgressPercent);
+        }
+    }
 
     public void Enqueue(Guid itemId, string name, string sourcePath, PluginConfiguration config)
     {
@@ -95,13 +106,17 @@ public class JobQueueService : IDisposable
     {
         await _semaphore.WaitAsync().ConfigureAwait(false);
         job.Status = JobStatus.Running;
+        job.IsCancelling = false;
 
-        // Progress polling
-        var progressCts = new CancellationTokenSource();
-        var progressTask = Task.Run(async () =>
+        // Encode iptal kontrolu + progress polling
+        var encodeCts = new CancellationTokenSource();
+        var monitorCts = new CancellationTokenSource();
+        var monitorTask = Task.Run(async () =>
         {
-            while (!progressCts.Token.IsCancellationRequested)
+            while (!monitorCts.Token.IsCancellationRequested)
             {
+                await Task.Delay(500, monitorCts.Token).ConfigureAwait(false);
+                // Progress guncelle
                 try
                 {
                     if (File.Exists(outputPath))
@@ -112,23 +127,42 @@ public class JobQueueService : IDisposable
                     }
                 }
                 catch { }
-                await Task.Delay(1000, progressCts.Token).ConfigureAwait(false);
+                // Iptal kontrolu
+                if (job.IsCancelling && !encodeCts.IsCancellationRequested)
+                {
+                    _logger.LogInformation("PreTranscode: iptal ediliyor {Name} ({Progress}%)", job.Name, job.ProgressPercent);
+                    encodeCts.Cancel();
+                }
             }
-        }, progressCts.Token);
+        }, monitorCts.Token);
 
         try
         {
-            var success = await _encoderService.TranscodeAsync(sourcePath, outputPath, config, CancellationToken.None).ConfigureAwait(false);
-            job.Status = success ? JobStatus.Completed : JobStatus.Failed;
-            job.ProgressPercent = success ? 100 : job.ProgressPercent;
-            if (success)
+            var success = await _encoderService.TranscodeAsync(sourcePath, outputPath, config, encodeCts.Token).ConfigureAwait(false);
+            if (job.IsCancelling)
             {
+                // Iptal edildi - partial dosyayi sil
+                job.Status = JobStatus.Cancelled;
+                job.Error = "Kullanici tarafindan iptal edildi.";
+                CleanupPartial(outputPath);
+            }
+            else if (success)
+            {
+                job.Status = JobStatus.Completed;
+                job.ProgressPercent = 100;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
             }
-            if (!success)
+            else
             {
+                job.Status = JobStatus.Failed;
                 job.Error = "ffmpeg başarısız oldu, sunucu loglarına bakın.";
             }
+        }
+        catch (OperationCanceledException)
+        {
+            job.Status = JobStatus.Cancelled;
+            job.Error = "Kullanici tarafindan iptal edildi.";
+            CleanupPartial(outputPath);
         }
         catch (Exception ex)
         {
@@ -138,9 +172,27 @@ public class JobQueueService : IDisposable
         }
         finally
         {
-            progressCts.Cancel();
-            try { await progressTask.ConfigureAwait(false); } catch { }
+            monitorCts.Cancel();
+            try { await monitorTask.ConfigureAwait(false); } catch { }
+            encodeCts.Dispose();
             _semaphore.Release();
+        }
+    }
+
+    private static void CleanupPartial(string? outputPath)
+    {
+        if (string.IsNullOrEmpty(outputPath)) return;
+        try
+        {
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Best effort - logla ama hata verme
+            System.Diagnostics.Debug.WriteLine($"PreTranscode: partial dosya silinemedi: {ex.Message}");
         }
     }
 
