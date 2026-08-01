@@ -93,9 +93,14 @@ public class EncoderService
     {
         try
         {
+            // ffprobe yolu: ffmpeg -> ffprobe (dosya adi), jellyfin-ffmpeg -> jellyfin-ffmpeg (dizin ayni kalir)
+            var ffmpegDir = Path.GetDirectoryName(FfmpegPath) ?? ".";
+            var ffprobeName = Path.GetFileName(FfmpegPath).Replace("ffmpeg", "ffprobe");
+            var ffprobePath = Path.Combine(ffmpegDir, ffprobeName);
+
             var psi = new ProcessStartInfo
             {
-                FileName = FfmpegPath.Replace("ffmpeg", "ffprobe").Replace("ffmpeg.exe", "ffprobe.exe"),
+                FileName = ffprobePath,
                 Arguments = $"-v error -select_streams v:0 -show_entries stream=pix_fmt -of default=noprint_wrappers=1:nokey=1 \"{sourcePath}\"",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -236,6 +241,35 @@ public class EncoderService
         var args = BuildArguments(sourcePath, outputPath, config, pixFmt);
         _logger.LogInformation("PreTranscode: ffmpeg={Ffmpeg} args={Args}", ffmpegPath, args);
 
+        var result = await RunFfmpeg(ffmpegPath, args, sourcePath, outputPath, cancellationToken);
+
+        // HW encode basarisiz olduysa ve VAAPI/QSV kullaniliyorsa, software encode ile tekrar dene
+        if (!result && config.HardwareAcceleration != HwAccelType.None && config.HardwareAcceleration != HwAccelType.Nvenc)
+        {
+            _logger.LogWarning("PreTranscode: {Accel} encode basarisiz, software encode ile tekrar deneniyor", config.HardwareAcceleration);
+            var fallbackConfig = new PluginConfiguration
+            {
+                HardwareAcceleration = HwAccelType.None,
+                RenderDevicePath = config.RenderDevicePath,
+                TargetVideoCodec = config.TargetVideoCodec,
+                Quality = config.Quality,
+                MaxWidth = config.MaxWidth,
+                MinimumFileSizeMb = config.MinimumFileSizeMb,
+                MaxConcurrentJobs = config.MaxConcurrentJobs,
+                SkipIfAlreadyTargetCodec = config.SkipIfAlreadyTargetCodec,
+                ReplaceOriginal = config.ReplaceOriginal,
+                OutputDirectory = config.OutputDirectory
+            };
+            var fallbackArgs = BuildArguments(sourcePath, outputPath, fallbackConfig, pixFmt);
+            _logger.LogInformation("PreTranscode: software fallback args={Args}", fallbackArgs);
+            result = await RunFfmpeg(ffmpegPath, fallbackArgs, sourcePath, outputPath, cancellationToken);
+        }
+
+        return result;
+    }
+
+    private async Task<bool> RunFfmpeg(string ffmpegPath, string args, string sourcePath, string outputPath, CancellationToken cancellationToken)
+    {
         var psi = new ProcessStartInfo
         {
             FileName = ffmpegPath,
@@ -348,9 +382,19 @@ public class EncoderService
             var needsFormatConvert = Is10BitFormat(sourcePixFmt) && config.TargetVideoCodec == "h264";
             if (needsFormatConvert)
             {
-                videoFilters.Append("format=yuv420p,");
+                // HDR -> SDR tonemap + 10-bit -> 8-bit format donusumu
+                videoFilters.Append("zscale=t=linear:npl=100,format=gbrpf32le,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p,");
+                _logger.LogInformation("PreTranscode: HDR tonemap + 10-bit->8-bit donusum eklendi");
             }
-            if (config.MaxWidth > 0)
+            else if (Is10BitFormat(sourcePixFmt))
+            {
+                // 10-bit SDR -> hevc hedef
+                if (config.MaxWidth > 0)
+                {
+                    videoFilters.Append($"scale=w='min({config.MaxWidth},iw)':h=-2,");
+                }
+            }
+            else if (config.MaxWidth > 0)
             {
                 videoFilters.Append($"scale=w='min({config.MaxWidth},iw)':h=-2,");
             }
