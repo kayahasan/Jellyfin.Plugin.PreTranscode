@@ -243,11 +243,10 @@ public class EncoderService
 
         var result = await RunFfmpeg(ffmpegPath, args, sourcePath, outputPath, cancellationToken);
 
-        // HW encode basarisiz olduysa, software encode ile tekrar dene
-        // VAAPI/QSV: codec destek problemi, AMF: runtime kütüphane eksik (LXC)
-        if (!result && config.HardwareAcceleration != HwAccelType.None && config.HardwareAcceleration != HwAccelType.Nvenc)
+        // AMF Linux LXC'de calismaz (libamfrt64.so.1 yok) - sadece AMF icin software fallback
+        if (!result && config.HardwareAcceleration == HwAccelType.Amf)
         {
-            _logger.LogWarning("PreTranscode: {Accel} encode basarisiz, software encode ile tekrar deneniyor", config.HardwareAcceleration);
+            _logger.LogWarning("PreTranscode: AMF encode basarisiz, software encode ile tekrar deneniyor");
             var fallbackConfig = new PluginConfiguration
             {
                 HardwareAcceleration = HwAccelType.None,
