@@ -405,16 +405,24 @@ function loadCfg(){
 ApiClient.getPluginConfiguration(pid).then(function(cfg){
 var v=document.getElementById('PreTranscodeListPage');
 v.querySelector('#HardwareAcceleration').value=cfg.HardwareAcceleration;
-v.querySelector('#RenderDevicePath').value=cfg.RenderDevicePath;
+v.querySelector('#RenderDevicePath').value=cfg.RenderDevicePath||'';
 v.querySelector('#TargetVideoCodec').value=cfg.TargetVideoCodec;
-v.querySelector('#Quality').value=cfg.Quality;
-v.querySelector('#MaxWidth').value=cfg.MaxWidth;
-v.querySelector('#MinimumFileSizeMb').value=cfg.MinimumFileSizeMb;
-v.querySelector('#MaxConcurrentJobs').value=cfg.MaxConcurrentJobs;
+v.querySelector('#Quality').value=cfg.Quality||24;
+v.querySelector('#MaxWidth').value=cfg.MaxWidth||0;
+v.querySelector('#MinimumFileSizeMb').value=cfg.MinimumFileSizeMb||100;
+v.querySelector('#MaxConcurrentJobs').value=cfg.MaxConcurrentJobs||1;
 v.querySelector('#SkipIfAlreadyTargetCodec').checked=cfg.SkipIfAlreadyTargetCodec;
 v.querySelector('#ReplaceOriginal').checked=cfg.ReplaceOriginal;
 var hw=cfg.HardwareAcceleration;
 document.getElementById('RenderDeviceField').style.display=(hw==='Vaapi'||hw==='Qsv')?'':'none';
+}).catch(function(e){
+console.error('PreTranscode: config yuklenemedi',e);
+// Default degerlerle doldur
+var v=document.getElementById('PreTranscodeListPage');
+v.querySelector('#Quality').value=24;
+v.querySelector('#MaxWidth').value=0;
+v.querySelector('#MinimumFileSizeMb').value=100;
+v.querySelector('#MaxConcurrentJobs').value=1;
 });
 }
 

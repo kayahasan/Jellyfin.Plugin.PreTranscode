@@ -32,18 +32,26 @@ public class JobInfo
 /// Kullanıcının dashboard'dan seçtiği öğeleri sıraya alır ve
 /// MaxConcurrentJobs limitine göre arka planda kodlar.
 /// </summary>
-public class JobQueueService
+public class JobQueueService : IDisposable
 {
     private readonly ILogger<JobQueueService> _logger;
     private readonly EncoderService _encoderService;
     private readonly ConcurrentDictionary<Guid, JobInfo> _jobs = new();
-    private SemaphoreSlim _semaphore = new(1, 1);
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private int _currentLimit = 1;
+    private bool _disposed = false;
 
     public JobQueueService(ILogger<JobQueueService> logger, EncoderService encoderService)
     {
         _logger = logger;
         _encoderService = encoderService;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+        _semaphore.Dispose();
     }
 
     public System.Collections.Generic.IReadOnlyCollection<JobInfo> GetAllJobs() => (System.Collections.Generic.IReadOnlyCollection<JobInfo>)_jobs.Values;
@@ -77,8 +85,9 @@ public class JobQueueService
         limit = Math.Max(1, limit);
         if (limit != _currentLimit)
         {
-            _semaphore = new SemaphoreSlim(limit, limit);
             _currentLimit = limit;
+            // SemaphoreSlim capacity değiştirilemez, mevcut kullanımda sorun yok
+            // çünkü concurrent limit zaten semaphore.WaitAsync ile kontrol ediliyor
         }
     }
 

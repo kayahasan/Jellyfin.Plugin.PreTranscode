@@ -220,6 +220,7 @@ return na.CompareTo(nb);
         var nameNoExt = Path.GetFileNameWithoutExtension(sourcePath);
         return Path.Combine(directory, $"{nameNoExt}-optimized.mkv");
     }
+
 }
 
 // Extension methods
