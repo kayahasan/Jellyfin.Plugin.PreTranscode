@@ -102,12 +102,7 @@ var pid="b3a1c9e4-6f2d-4a8b-9c3e-2d1f5a7b8c90";
 var sel=new Set();
 var jobInterval=null;
 
-// Add animation keyframes
-(function(){
-var s=document.createElement('style');
-s.textContent='@keyframes pt-pulse{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}';
-document.head.appendChild(s);
-})();
+
 
 // Job progress polling
 function pollJobs(){
@@ -139,7 +134,7 @@ var srcStr=srcMb>0?(srcMb>=1024?(srcMb/1024).toFixed(2)+'GB':Math.round(srcMb)+'
 // Cancel button
 var cancelBtn='';
 if(j.Status==='Running'){
-cancelBtn='<button onclick="cancelJob(\''+j.ItemId+'\')" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">Iptal</button>';
+cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">Iptal</button>';
 }
 
 html+='<div style="display:flex;align-items:center;gap:.5em;padding:.5em 0;border-bottom:1px solid rgba(255,255,255,.04);">';
@@ -165,10 +160,17 @@ p.innerHTML=html;
 
 // Keep polling if there are running/queued jobs
 var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
-// Remove old completed/failed/cancelled jobs after delay
-if(hasActive){var t=setTimeout(function(){var p2=document.getElementById('JobPanel');var oldJobs=p2.querySelectorAll('[data-status="Completed"],[data-status="Failed"],[data-status="Cancelled"]');oldJobs.forEach(function(el){el.remove();});},10000);
 if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;setTimeout(function(){document.getElementById('JobPanel').style.display='none';},5000);}
+if(hasActive){setTimeout(function(){var p2=document.getElementById('JobPanel');var oldJobs=p2.querySelectorAll('[data-status="Completed"],[data-status="Failed"],[data-status="Cancelled"]');oldJobs.forEach(function(el){el.remove();});},10000);}
 }
+// Bind cancel buttons
+p.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
+btn.onclick=function(){
+var jobId=this.getAttribute('data-cancel-id');
+if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
+ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+jobId)});
+};
+});
 
 // Tabs
 function showTab(t){
@@ -191,10 +193,6 @@ document.getElementById('TabLibrary').onclick=function(){showTab('l');};
 document.getElementById('TabSettings').onclick=function(){showTab('s');};
 
 function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
-function cancelJob(id){
-if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
-ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+id)});
-}
 function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
 function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
 function ucnt(){document.getElementById('SelectedCount').textContent=sel.size>0?sel.size+' secili':'';}
@@ -446,7 +444,7 @@ document.getElementById('RenderDeviceField').style.display=(this.value==='Vaapi'
 
 document.getElementById('PreTranscodeConfigForm').addEventListener('submit',function(e){
 e.preventDefault();
-var v=this.closest('#PreTranscodeListPage');
+var v=document.getElementById('PreTranscodeListPage');
 Dashboard.showLoadingMsg();
 ApiClient.getPluginConfiguration(pid).then(function(cfg){
 cfg.HardwareAcceleration=v.querySelector('#HardwareAcceleration').value;
