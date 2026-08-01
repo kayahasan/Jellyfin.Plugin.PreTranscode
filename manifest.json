@@ -46,9 +46,7 @@
         "checksum": "C81A1B88DFF82FB5195051ABBEF134BF",
         "changelog": "Fix CUDA/NVENC encoding: add hwdownload+format=nv12 filter chain",
         "timestamp": "2025-08-01T03:30:00Z"
-      },
-
-
+      }
     ]
   }
 ]
