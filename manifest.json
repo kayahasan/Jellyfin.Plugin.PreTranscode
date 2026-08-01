@@ -11,6 +11,7 @@
         "version": "1.0.0.3",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.3/PreTranscode_1.0.0.3.zip",
+        "checksum": "ED51C3A074BC84ED33F8EEF2FA8FD8E4DBBAD90F4A683F29B71A4D12191F9D97",
         "changelog": "Fix plugin load error (.NET 10 dependency conflict), add TR/EN description, fix settings panel, improve UI stability",
         "timestamp": "2025-08-01T02:50:00Z"
       },
