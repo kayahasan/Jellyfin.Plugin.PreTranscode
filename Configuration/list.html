@@ -20,13 +20,42 @@
 </div>
 
 <div id="PanelLibrary">
-<div style="display:flex;gap:.5em;margin-bottom:1em;flex-wrap:wrap;align-items:center;">
+<div style="display:flex;gap:.5em;margin-bottom:.75em;flex-wrap:wrap;align-items:center;">
 <button id="RefreshBtn" is="emby-button" type="button" class="button-flat"><span>&#8635; Yenile</span></button>
 <button id="SelectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#9745; T&#252;m&#252;n&#252; Se&#305;</span></button>
 <button id="DeselectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#10008; Kald&#305;r</span></button>
 <div style="flex:1;"></div>
 <span id="SelectedCount" style="color:#888;font-size:.85em;"></span>
 <button id="EncodeBtn" is="emby-button" type="button" class="raised button-submit block"><span>&#9654; Se&#305;ilenleri Kodla</span></button>
+</div>
+<div style="display:flex;gap:.5em;margin-bottom:1em;flex-wrap:wrap;align-items:center;">
+<span style="font-size:.8em;color:#888;">&#128269; Filtrele:</span>
+<select id="FilterCodec" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<option value="">T&#252;m Codec'ler</option>
+<option value="hevc">HEVC</option>
+<option value="h264">H.264</option>
+<option value="av1">AV1</option>
+<option value="vp9">VP9</option>
+</select>
+<select id="FilterRes" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<option value="">T&#252;m &#305;z&#252;nl&#252;kler</option>
+<option value="4K">4K</option>
+<option value="1080p">1080p</option>
+<option value="720p">720p</option>
+</select>
+<select id="FilterSize" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<option value="">T&#252;m Boyutlar</option>
+<option value="1024">1GB+</option>
+<option value="5120">5GB+</option>
+<option value="10240">10GB+</option>
+</select>
+<span style="font-size:.8em;color:#888;margin-left:.5em;">&#128203; S&#305;rala:</span>
+<select id="SortBy" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<option value="size-desc">Boyut (b&#252;y&#252;k&#8594;k&#252;&#305;&#305;k)</option>
+<option value="size-asc">Boyut (k&#252;&#305;&#305;k&#8594;b&#252;y&#252;k)</option>
+<option value="name-asc">&#305;sim (A-Z)</option>
+</select>
+<span id="FilterCount" style="font-size:.8em;color:#666;margin-left:.5em;"></span>
 </div>
 <div id="LibraryContent"></div>
 </div>
@@ -120,6 +149,7 @@
 var pid="b3a1c9e4-6f2d-4a8b-9c3e-2d1f5a7b8c90";
 var sel=new Set();
 var jobInterval=null;
+var rawItems=null; // Store raw API data for filtering
 
 
 
@@ -276,6 +306,12 @@ document.getElementById('TabLibrary').onclick=function(){showTab('l');};
 document.getElementById('TabJobs').onclick=function(){showTab('j');};
 document.getElementById('TabSettings').onclick=function(){showTab('s');};
 
+// Filter/Sort event listeners
+document.getElementById('FilterCodec').onchange=function(){applyFiltersAndRender();};
+document.getElementById('FilterRes').onchange=function(){applyFiltersAndRender();};
+document.getElementById('FilterSize').onchange=function(){applyFiltersAndRender();};
+document.getElementById('SortBy').onchange=function(){applyFiltersAndRender();};
+
 function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
 function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
 function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
@@ -328,7 +364,10 @@ tn.textContent=item.Name;
 ft.appendChild(tn);
 var mt=document.createElement('div');
 mt.style.cssText='font-size:.9em;color:#ccc;margin-top:.15em;';
-mt.textContent=fsize(item.SizeMb)+' | '+item.Codec.toUpperCase();
+var metaParts=[fsize(item.SizeMb)];
+if(item.Resolution) metaParts.push(item.Resolution);
+metaParts.push(item.Codec.toUpperCase());
+mt.textContent=metaParts.join(' | ');
 ft.appendChild(mt);
 ov.appendChild(ft);
 
@@ -507,7 +546,8 @@ if(!r.ok) throw new Error('API hata: '+r.status+' '+r.statusText);
 return r.json();
 })
 .then(function(d){
-try{render(d);}catch(e){console.error('PreTranscode render hatasi:',e);throw e;}
+rawItems=d; // Store raw data
+try{applyFiltersAndRender();}catch(e){console.error('PreTranscode render hatasi:',e);throw e;}
 Dashboard.hideLoadingMsg();
 })
 .catch(function(e){
@@ -516,6 +556,67 @@ Dashboard.hideLoadingMsg();
 var c=document.getElementById('LibraryContent');
 c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><div style="font-size:1.5em;margin-bottom:.5em;">&#9888;</div><p>Yuklenemedi: '+esc(String(e))+'</p><p style="font-size:.85em;color:#888;margin-top:.5em;">Yenile butonuna basin veya sayfayi yenileyin.</p></div>';
 });
+}
+
+// Filter + Sort
+function applyFiltersAndRender(){
+if(!rawItems) return;
+var codec=document.getElementById('FilterCodec').value.toLowerCase();
+var res=document.getElementById('FilterRes').value;
+var minSize=parseInt(document.getElementById('FilterSize').value)||0;
+var sortBy=document.getElementById('SortBy').value;
+
+var movies=(rawItems.Movies||[]).filter(function(m){
+if(codec && !m.Codec.toLowerCase().includes(codec)) return false;
+if(res && m.Resolution !== res) return false;
+if(minSize && m.SizeMb < minSize) return false;
+return true;
+});
+
+var series=(rawItems.Series||[]).map(function(s){
+return {
+Id: s.Id,
+Name: s.Name,
+PosterUrl: s.PosterUrl,
+Seasons: (s.Seasons||[]).map(function(sn){
+return {
+SeasonNumber: sn.SeasonNumber,
+Episodes: (sn.Episodes||[]).filter(function(e){
+if(codec && !e.Codec.toLowerCase().includes(codec)) return false;
+if(res && e.Resolution !== res) return false;
+if(minSize && e.SizeMb < minSize) return false;
+return true;
+})
+};
+}).filter(function(sn){return sn.Episodes.length>0;})
+};
+}).filter(function(s){return s.Seasons.length>0;});
+
+// Sort movies
+if(sortBy==='size-desc') movies.sort(function(a,b){return b.SizeMb-a.SizeMb;});
+else if(sortBy==='size-asc') movies.sort(function(a,b){return a.SizeMb-b.SizeMb;});
+else if(sortBy==='name-asc') movies.sort(function(a,b){return a.Name.localeCompare(b.Name);});
+
+// Sort series by name
+if(sortBy==='name-asc') series.sort(function(a,b){return a.Name.localeCompare(b.Name);});
+
+// Update filter count
+var totalMovies=movies.length;
+var totalEpisodes=0;
+series.forEach(function(s){s.Seasons.forEach(function(sn){totalEpisodes+=sn.Episodes.length;});});
+var total=totalMovies+totalEpisodes;
+var originalMovies=(rawItems.Movies||[]).length;
+var originalEpisodes=0;
+(rawItems.Series||[]).forEach(function(s){s.Seasons.forEach(function(sn){originalEpisodes+=sn.Episodes.length;});});
+var originalTotal=originalMovies+originalEpisodes;
+var fc=document.getElementById('FilterCount');
+if(total<originalTotal){
+fc.textContent=total+'/'+originalTotal+' gosteriliyor';
+}else{
+fc.textContent='';
+}
+
+render({Movies:movies,Series:series});
 }
 
 function loadCfg(){

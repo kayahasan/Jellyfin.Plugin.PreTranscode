@@ -20,6 +20,7 @@ public class NonStandardItemDto
     public string Codec { get; set; } = string.Empty;
     public double SizeMb { get; set; }
     public string? PosterUrl { get; set; }
+    public string? Resolution { get; set; } // e.g. "4K", "1080p", "720p"
 }
 
 public class SeasonGroupDto
@@ -112,6 +113,7 @@ public class PreTranscodeController : ControllerBase
             }
 
             var videoStream = item.GetMediaStreams()?.FirstOrDefault(s => s.Type == MediaStreamType.Video);
+            var resolution = GetResolution(videoStream);
 
             if (item is MediaBrowser.Controller.Entities.Movies.Movie)
             {
@@ -122,7 +124,8 @@ public class PreTranscodeController : ControllerBase
                     Path = item.Path,
                     Codec = videoStream?.Codec ?? "bilinmiyor",
                     SizeMb = Math.Round(fileSize / 1024.0 / 1024.0, 1),
-                    PosterUrl = item.Id.ToString()
+                    PosterUrl = item.Id.ToString(),
+                    Resolution = resolution
                 });
             }
             else if (item is MediaBrowser.Controller.Entities.TV.Episode episode)
@@ -147,7 +150,8 @@ public class PreTranscodeController : ControllerBase
                     Name = $"{epNum} - {item.Name}",
                     Path = item.Path,
                     Codec = videoStream?.Codec ?? "bilinmiyor",
-                    SizeMb = Math.Round(fileSize / 1024.0 / 1024.0, 1)
+                    SizeMb = Math.Round(fileSize / 1024.0 / 1024.0, 1),
+                    Resolution = resolution
                 });
             }
         }
@@ -229,6 +233,18 @@ return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
 
         var nameNoExt = Path.GetFileNameWithoutExtension(sourcePath);
         return Path.Combine(directory, $"{nameNoExt}-optimized.mkv");
+    }
+
+    private static string? GetResolution(dynamic? videoStream)
+    {
+        if (videoStream is null) return null;
+        var width = videoStream.Width ?? 0;
+        var height = videoStream.Height ?? 0;
+        
+        if (width >= 3840 || height >= 2160) return "4K";
+        if (width >= 1920 || height >= 1080) return "1080p";
+        if (width >= 1280 || height >= 720) return "720p";
+        return null;
     }
 
 }
