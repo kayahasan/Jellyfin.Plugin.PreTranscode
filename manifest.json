@@ -11,7 +11,7 @@
         "version": "1.0.0.16",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.16/PreTranscode_1.0.0.16.zip",
-        "checksum": "80A9818226CDA7F93451801C04FA9D01",
+        "checksum": "0DF0E2DDF5F57E5112E6DE9F26BBE579",
         "changelog": "New Jobs tab with summary - dedicated job monitoring with stats (total, active, completed, saved space)",
         "timestamp": "2026-08-02T14:00:00Z"
       },
