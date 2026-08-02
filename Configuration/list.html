@@ -199,10 +199,30 @@ html+='</div>';
 html+='<div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:.35em;overflow:hidden;">';
 html+='<div style="height:100%;width:'+pct+'%;background:'+statusColor+';border-radius:3px;transition:width .5s ease;"></div>';
 html+='</div>';
-html+='<div style="display:flex;justify-content:space-between;margin-top:.2em;font-size:.72em;color:#888;">';
+// Encoder badge + codec info
+var encoderBadge='';
+if(j.EncoderType){
+var isGpu=j.EncoderType.includes('(GPU)');
+var badgeBg=isGpu?'rgba(48,209,88,.15)':'rgba(136,136,136,.2)';
+var badgeBorder=isGpu?'#30d158':'#666';
+var badgeColor=isGpu?'#30d158':'#999';
+encoderBadge='<span style="background:'+badgeBg+';border:1px solid '+badgeBorder+';color:'+badgeColor+';padding:1px 5px;border-radius:3px;font-size:.68em;margin-right:.3em;">'+esc(j.EncoderType)+'</span>';
+}
+var codecInfo='';
+if(j.CodecConversion){
+codecInfo='<span style="color:#999;">'+esc(j.CodecConversion)+'</span>';
+}
+
+html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:.2em;font-size:.72em;color:#888;">';
 html+='<span>'+sizeStr+' / '+srcStr+'</span>';
 html+='<span>'+statusText+'</span>';
 html+='</div>';
+if(encoderBadge||codecInfo){
+html+='<div style="display:flex;gap:.5em;margin-top:.25em;align-items:center;">';
+html+=encoderBadge;
+html+=codecInfo;
+html+='</div>';
+}
 html+='</div>';
 html+='</div>';
 });
@@ -212,6 +232,12 @@ p.innerHTML=html;
 // Keep polling if there are running/queued jobs
 var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
 if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;}
+
+// Helper: format size
+function fsize(mb){
+if(mb>=1024) return (mb/1024).toFixed(1)+'GB';
+return Math.round(mb)+'MB';
+}
 // Bind cancel buttons
 p.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
 btn.onclick=function(){

@@ -292,7 +292,29 @@ public class EncoderService
 
         process.Start();
         process.BeginErrorReadLine();
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+
+        try
+        {
+            await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // Iptal edildi - ffmpeg process'ini kill et
+            _logger.LogInformation("PreTranscode: iptal edildi, ffmpeg kill ediliyor (PID {Pid})", process.Id);
+            try
+            {
+                if (!process.HasExited)
+                {
+                    process.Kill(true); // true = child process'leri de kill et
+                    process.WaitForExit(3000);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "PreTranscode: ffmpeg kill hatasi");
+            }
+            throw; // OperationCanceledException'i yukari aktar
+        }
 
         if (process.ExitCode != 0)
         {

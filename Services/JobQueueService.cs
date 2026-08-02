@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Jellyfin.Plugin.PreTranscode.Configuration;
 using Microsoft.Extensions.Logging;
 
+// Import HwAccelType from Configuration namespace
+using HwAccelType = Jellyfin.Plugin.PreTranscode.Configuration.HwAccelType;
+
 namespace Jellyfin.Plugin.PreTranscode.Services;
 
 public enum JobStatus
@@ -28,6 +31,11 @@ public class JobInfo
     public double OutputSizeMb { get; set; }
     public string? OutputPath { get; set; }
     public bool IsCancelling { get; set; }
+    public string? EncoderType { get; set; } // e.g. "h264_vaapi (GPU)", "libx264 (CPU)"
+    public string? CodecConversion { get; set; } // e.g. "HEVC -> H.264"
+    public string? ResolutionConversion { get; set; } // e.g. "4K -> 1080p"
+    public DateTime StartedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
 }
 
 /// <summary>
@@ -78,13 +86,20 @@ public class JobQueueService : IDisposable
 
         var outputPath = GetOutputPath(sourcePath, config);
         var sourceSize = new FileInfo(sourcePath).Length;
+        
+        // Build encoder type display string
+        var encoderType = GetEncoderType(config);
+        var codecConversion = GetCodecConversion(sourcePath, config);
+        
         var job = new JobInfo
         {
             ItemId = itemId,
             Name = name,
             Status = JobStatus.Queued,
             OutputPath = outputPath,
-            SourceSizeMb = Math.Round(sourceSize / 1024.0 / 1024.0, 1)
+            SourceSizeMb = Math.Round(sourceSize / 1024.0 / 1024.0, 1),
+            EncoderType = encoderType,
+            CodecConversion = codecConversion
         };
         _jobs[itemId] = job;
 
@@ -102,11 +117,37 @@ public class JobQueueService : IDisposable
         }
     }
 
+    private static string GetEncoderType(PluginConfiguration config)
+    {
+        var isGpu = config.HardwareAcceleration != HwAccelType.None;
+        var suffix = isGpu ? "(GPU)" : "(CPU)";
+        
+        var codec = config.TargetVideoCodec;
+        return config.HardwareAcceleration switch
+        {
+            HwAccelType.None => $"lib{codec == "hevc" ? "x265" : "x264"} {suffix}",
+            HwAccelType.Vaapi => $"{codec}_vaapi {suffix}",
+            HwAccelType.Qsv => $"{codec}_qsv {suffix}",
+            HwAccelType.Nvenc => $"{codec}_nvenc {suffix}",
+            HwAccelType.Amf => $"{codec}_amf {suffix}",
+            _ => $"{codec} {suffix}"
+        };
+    }
+
+    private static string? GetCodecConversion(string sourcePath, PluginConfiguration config)
+    {
+        // TODO: Use ffprobe to detect source codec
+        // For now, show target codec info
+        var target = config.TargetVideoCodec == "hevc" ? "HEVC" : "H.264";
+        return $"-> {target}";
+    }
+
     private async Task RunJobAsync(JobInfo job, string sourcePath, string outputPath, long sourceSize, PluginConfiguration config)
     {
         await _semaphore.WaitAsync().ConfigureAwait(false);
         job.Status = JobStatus.Running;
         job.IsCancelling = false;
+        job.StartedAt = DateTime.UtcNow;
 
         // Encode iptal kontrolu + progress polling
         var encodeCts = new CancellationTokenSource();
@@ -150,6 +191,7 @@ public class JobQueueService : IDisposable
             {
                 job.Status = JobStatus.Completed;
                 job.ProgressPercent = 100;
+                job.CompletedAt = DateTime.UtcNow;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
             }
             else

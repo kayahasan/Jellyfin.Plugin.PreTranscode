@@ -35,18 +35,53 @@ jobs:
           VERSION=${GITHUB_REF_NAME#v}
           zip -j "PreTranscode_${VERSION}.zip" publish/Jellyfin.Plugin.PreTranscode.dll
 
-      - name: Checksum
+      - name: Initial Checksum
         shell: bash
         run: |
           VERSION=${GITHUB_REF_NAME#v}
-          md5sum "PreTranscode_${VERSION}.zip" | awk '{print toupper($1)}' > checksum.txt
+          md5sum "PreTranscode_${VERSION}.zip" | awk '{print toupper($1)}' > initial_checksum.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: PreTranscode_*.zip
-          body_path: checksum.txt
+          body: "Verifying checksum..."
           generate_release_notes: true
+
+      - name: Verify Checksum from GitHub
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          ZIP_NAME="PreTranscode_${VERSION}.zip"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${ZIP_NAME}"
+          
+          # Wait for release to be available
+          sleep 10
+          
+          # Download the ZIP from GitHub
+          curl -L -o "downloaded_${ZIP_NAME}" "$DOWNLOAD_URL"
+          
+          # Calculate checksum of downloaded file (this is what Jellyfin will see)
+          md5sum "downloaded_${ZIP_NAME}" | awk '{print toupper($1)}' > checksum.txt
+          
+          # Compare with initial
+          INITIAL=$(cat initial_checksum.txt)
+          ACTUAL=$(cat checksum.txt)
+          echo "Initial checksum: $INITIAL"
+          echo "Downloaded checksum: $ACTUAL"
+          
+          if [ "$INITIAL" != "$ACTUAL" ]; then
+            echo "WARNING: Checksum mismatch! Using downloaded checksum."
+          fi
+
+      - name: Update Release Body with Checksum
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          CHECKSUM=$(cat checksum.txt)
+          gh release edit "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes "$CHECKSUM"
 
       - name: Update Manifest
         shell: bash
