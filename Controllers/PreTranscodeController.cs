@@ -201,7 +201,7 @@ return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
     }
 
     [HttpPost("Cancel/{itemId}")]
-    public ActionResult Cancel([FromBody] Guid itemId)
+    public ActionResult Cancel([FromRoute] Guid itemId)
     {
         _jobQueueService.CancelJob(itemId);
         return Ok(new { cancelled = true });
