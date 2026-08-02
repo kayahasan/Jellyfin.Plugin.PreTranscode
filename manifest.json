@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.20",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.20/PreTranscode_1.0.0.20.zip",
+        "checksum": "8CA4F36A196D605901BA102321412E4F",
+        "changelog": "Activity Log integration - encode complete/fail notifications in Jellyfin Dashboard",
+        "timestamp": "2026-08-02T20:00:00Z"
+      },
+      {
         "version": "1.0.0.19",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.19/PreTranscode_1.0.0.19.zip",
