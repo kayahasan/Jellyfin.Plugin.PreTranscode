@@ -357,12 +357,13 @@ public class EncoderService
         if (config.HardwareAcceleration == HwAccelType.Vaapi)
         {
             // h264_vaapi sadece 8-bit destekler - 10-bit kaynaklari donustur
+            // AMD VAAPI'de format=nv12|vaapi calismiyor, hwdownload+hwupload kullan
             var needsFormatConvert = Is10BitFormat(sourcePixFmt) && config.TargetVideoCodec == "h264";
             if (needsFormatConvert)
             {
-                // VAAPI frame'ler GPU'da - format filter'i vaapi formatinda olmalı
-                videoFilters.Append("format=nv12|vaapi,");
-                _logger.LogInformation("PreTranscode: 10-bit kaynak ({PixFmt}) -> nv12|vaapi format donusumu eklendi", sourcePixFmt);
+                // GPU -> CPU -> format convert -> GPU
+                videoFilters.Append("hwdownload,format=nv12,hwupload,");
+                _logger.LogInformation("PreTranscode: 10-bit kaynak ({PixFmt}) -> hwdownload+nv12+hwupload format donusumu eklendi", sourcePixFmt);
             }
 
             // MaxWidth scale filtresi
