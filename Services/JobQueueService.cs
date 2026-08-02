@@ -125,7 +125,7 @@ public class JobQueueService : IDisposable
         var codec = config.TargetVideoCodec;
         return config.HardwareAcceleration switch
         {
-            HwAccelType.None => $"lib{codec == "hevc" ? "x265" : "x264"} {suffix}",
+            HwAccelType.None => $"lib{(codec == "hevc" ? "x265" : "x264")} {suffix}",
             HwAccelType.Vaapi => $"{codec}_vaapi {suffix}",
             HwAccelType.Qsv => $"{codec}_qsv {suffix}",
             HwAccelType.Nvenc => $"{codec}_nvenc {suffix}",
