@@ -28,34 +28,42 @@
 <span id="SelectedCount" style="color:#888;font-size:.85em;"></span>
 <button id="EncodeBtn" is="emby-button" type="button" class="raised button-submit block"><span>&#9654; Se&#305;ilenleri Kodla</span></button>
 </div>
-<div style="display:flex;gap:.5em;margin-bottom:1em;flex-wrap:wrap;align-items:center;">
-<span style="font-size:.8em;color:#888;">&#128269; Filtrele:</span>
-<select id="FilterCodec" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<div style="background:#1a1a1a;border-radius:6px;padding:.75em;margin-bottom:1em;border:1px solid #333;">
+<div style="display:flex;gap:.5em;flex-wrap:wrap;align-items:center;">
+<span style="font-size:.85em;color:#aaa;font-weight:600;">&#128269; Filtrele:</span>
+<select id="FilterCodec" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:130px;">
 <option value="">T&#252;m Codec'ler</option>
 <option value="hevc">HEVC</option>
 <option value="h264">H.264</option>
 <option value="av1">AV1</option>
 <option value="vp9">VP9</option>
 </select>
-<select id="FilterRes" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<select id="FilterRes" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:120px;">
 <option value="">T&#252;m &#305;z&#252;nl&#252;kler</option>
 <option value="4K">4K</option>
 <option value="1080p">1080p</option>
 <option value="720p">720p</option>
 </select>
-<select id="FilterSize" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<select id="FilterSize" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:110px;">
 <option value="">T&#252;m Boyutlar</option>
 <option value="1024">1GB+</option>
 <option value="5120">5GB+</option>
 <option value="10240">10GB+</option>
 </select>
-<span style="font-size:.8em;color:#888;margin-left:.5em;">&#128203; S&#305;rala:</span>
-<select id="SortBy" style="background:#1a1a1a;border:1px solid #333;color:#ccc;padding:.3em .5em;border-radius:4px;font-size:.8em;">
+<span style="font-size:.85em;color:#aaa;font-weight:600;margin-left:.5em;">&#128203; S&#305;rala:</span>
+<select id="SortBy" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:180px;">
 <option value="size-desc">Boyut (b&#252;y&#252;k&#8594;k&#252;&#305;&#305;k)</option>
 <option value="size-asc">Boyut (k&#252;&#305;&#305;k&#8594;b&#252;y&#252;k)</option>
 <option value="name-asc">&#305;sim (A-Z)</option>
 </select>
-<span id="FilterCount" style="font-size:.8em;color:#666;margin-left:.5em;"></span>
+<span id="FilterCount" style="font-size:.85em;color:#30d158;margin-left:.5em;font-weight:600;"></span>
+</div>
+<div style="display:flex;gap:.5em;margin-top:.6em;flex-wrap:wrap;align-items:center;">
+<span style="font-size:.85em;color:#aaa;font-weight:600;">&#128640; Toplu:</span>
+<button id="BulkHevcToH264" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);color:#e50914;border-radius:4px;"><span>&#128260; HEVC &#8594; H.264</span></button>
+<button id="Bulk4kTo1080p" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(48,209,88,.15);border:1px solid rgba(48,209,88,.3);color:#30d158;border-radius:4px;"><span>&#128260; 4K &#8594; 1080p</span></button>
+<button id="BulkLargeFiles" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(255,165,0,.15);border:1px solid rgba(255,165,0,.3);color:#ffa500;border-radius:4px;"><span>&#128260; 5GB+ Dosyalar</span></button>
+</div>
 </div>
 <div id="LibraryContent"></div>
 </div>
@@ -127,11 +135,9 @@
 <div class="verticalSection">
 <h3>Se&#305;enekler</h3>
 <div class="checkboxContainer">
-<label><input is="emby-checkbox" type="checkbox" id="SkipIfAlreadyTargetCodec" /><span>Hedef codec'teki dosyalar&#305; atla</span></label>
-</div>
-<div class="checkboxContainer">
 <label><input is="emby-checkbox" type="checkbox" id="ReplaceOriginal" /><span style="color:#ff6b6b;">Orijinali de&#287;i&#351;tir (geri al&#305;namaz)</span></label>
 </div>
+<p style="font-size:.85em;color:#888;margin-top:.5em;">&#128270; Not: Kodlama sirasinda zaten hedef codec'teki dosyalar otomatik atlanir.</p>
 </div>
 
 <div style="padding-top:1.5em;">
@@ -629,7 +635,7 @@ v.querySelector('#Quality').value=cfg.Quality||24;
 v.querySelector('#MaxWidth').value=cfg.MaxWidth||0;
 v.querySelector('#MinimumFileSizeMb').value=cfg.MinimumFileSizeMb||100;
 v.querySelector('#MaxConcurrentJobs').value=cfg.MaxConcurrentJobs||1;
-v.querySelector('#SkipIfAlreadyTargetCodec').checked=cfg.SkipIfAlreadyTargetCodec;
+
 v.querySelector('#ReplaceOriginal').checked=cfg.ReplaceOriginal;
 var hw=cfg.HardwareAcceleration;
 document.getElementById('RenderDeviceField').style.display=(hw==='Vaapi'||hw==='Qsv')?'':'none';
@@ -660,7 +666,7 @@ cfg.Quality=parseInt(v.querySelector('#Quality').value,10);
 cfg.MaxWidth=parseInt(v.querySelector('#MaxWidth').value,10);
 cfg.MinimumFileSizeMb=parseInt(v.querySelector('#MinimumFileSizeMb').value,10);
 cfg.MaxConcurrentJobs=parseInt(v.querySelector('#MaxConcurrentJobs').value,10);
-cfg.SkipIfAlreadyTargetCodec=v.querySelector('#SkipIfAlreadyTargetCodec').checked;
+
 cfg.ReplaceOriginal=v.querySelector('#ReplaceOriginal').checked;
 ApiClient.updatePluginConfiguration(pid,cfg).then(function(r){
 Dashboard.processPluginConfigurationUpdateResult(r);
@@ -688,15 +694,114 @@ var ck=el.querySelector('div:first-child');if(ck){ck.style.background='';ck.styl
 ucnt();};
 document.getElementById('EncodeBtn').onclick=function(){
 var ids=Array.from(sel);
-if(!ids.length){Dashboard.alert('En az bir ogre sec.');return;}
+if(!ids.length){Dashboard.alert('En az bir dosya sec.');return;}
+showEncodePreview(ids);
+};
+
+function showEncodePreview(ids){
+Dashboard.showLoadingMsg();
+ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/EncodePreview'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
+.then(function(r){
+Dashboard.hideLoadingMsg();
+var totalSizeMb=r.TotalSizeMb||0;
+var totalSizeGb=(totalSizeMb/1024).toFixed(1);
+var estSavedGb=(totalSizeGb*0.4).toFixed(1); // Yaklasik %40 tasarruf
+var html='<div style="padding:1em;max-width:500px;">';
+html+='<h3 style="margin-top:0;color:#e50914;">&#128230; Kodlama Onizlemesi</h3>';
+html+='<p style="color:#ccc;">Toplam: <b>'+r.TotalItems+'</b> dosya (<b>'+totalSizeGb+' GB</b>)</p>';
+html+='<p style="color:#30d158;">Kodlanacak: <b>'+r.ToEncode+'</b> dosya</p>';
+if(r.AlreadyTargetCodec>0){
+html+='<p style="color:#ffa500;">Atlanacak: <b>'+r.AlreadyTargetCodec+'</b> dosya (zaten hedef codec\'te)</p>';
+if(r.SkippedItems&&r.SkippedItems.length>0){
+html+='<div style="background:#1a1a1a;padding:.5em;border-radius:4px;margin:.5em 0;font-size:.85em;color:#aaa;max-height:100px;overflow-y:auto;">';
+r.SkippedItems.slice(0,5).forEach(function(s){html+='<div>• '+s+'</div>';});
+if(r.SkippedItems.length>5) html+='<div style="color:#666;">...ve '+ (r.SkippedItems.length-5) +' tane daha</div>';
+html+='</div>';
+}
+}
+html+='<p style="color:#888;font-size:.85em;">Tahmini tasarruf: ~'+estSavedGb+' GB</p>';
+html+='<div style="margin-top:1em;display:flex;gap:.5em;justify-content:flex-end;">';
+html+='<button id="PreviewCancel" is="emby-button" class="button-flat">Iptal</button>';
+html+='<button id="PreviewConfirm" is="emby-button" class="raised button-submit">Kodlamaya Basla</button>';
+html+='</div></div>';
+
+var dlg=Dashboard.createDialog({title:'',html:html,scrollY:false});
+$(dlg.getModal()).css('maxWidth','550px');
+Dashboard.openDialog(dlg);
+
+$(dlg.getModal()).on('click','#PreviewCancel',function(){Dashboard.closeDialog(dlg);});
+$(dlg.getModal()).on('click','#PreviewConfirm',function(){
+Dashboard.closeDialog(dlg);
+encodeItems(ids);
+});
+})
+.catch(function(e){
+Dashboard.hideLoadingMsg();
+console.error('Preview hatasi:',e);
+Dashboard.alert('Onizleme alinamadi: '+e);
+});
+}
+
+function encodeItems(ids){
+Dashboard.showLoadingMsg();
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Encode'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
-.then(function(){
-Dashboard.alert(ids.length+' ogre kuyruga alindi. Isler tabinda takip edebilirsiniz.');
+.then(function(r){
+Dashboard.hideLoadingMsg();
+var msg=r.queued+' dosya kuyruga alindi.';
+if(r.skippedCount>0){
+msg+=' ('+r.skippedCount+' dosya zaten hedef codec\'te, atlandi)';
+}
+Dashboard.alert(msg);
 if(!jobInterval){jobInterval=setInterval(pollJobs,2000);}
 pollJobs();
 showTab('j');
+})
+.catch(function(e){
+Dashboard.hideLoadingMsg();
+console.error('Encode hatasi:',e);
+Dashboard.alert('Kodlama baslatilamadi: '+e);
 });
+}
+
+// Bulk operations
+document.getElementById('BulkHevcToH264').onclick=function(){
+if(!rawItems) return;
+sel.clear();
+var count=0;
+(rawItems.Movies||[]).forEach(function(m){if(m.Codec.toLowerCase().includes('hevc')){sel.add(m.Id);count++;}});
+(rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.Codec.toLowerCase().includes('hevc')){sel.add(e.Id);count++;}});});});
+if(count===0){Dashboard.alert('HEVC dosya bulunamadi.');ucnt();return;}
+// Apply HEVC filter to show selected
+applyFilterSelection('FilterCodec','hevc');
+Dashboard.alert(count+' HEVC dosya secildi. "Secilenleri Kodla" butonuna basin.');
 };
+
+document.getElementById('Bulk4kTo1080p').onclick=function(){
+if(!rawItems) return;
+sel.clear();
+var count=0;
+(rawItems.Movies||[]).forEach(function(m){if(m.Resolution==='4K'){sel.add(m.Id);count++;}});
+(rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.Resolution==='4K'){sel.add(e.Id);count++;}});});});
+if(count===0){Dashboard.alert('4K dosya bulunamadi.');ucnt();return;}
+applyFilterSelection('FilterRes','4K');
+Dashboard.alert(count+' 4K dosya secildi. "Secilenleri Kodla" butonuna basin.');
+};
+
+document.getElementById('BulkLargeFiles').onclick=function(){
+if(!rawItems) return;
+sel.clear();
+var count=0;
+(rawItems.Movies||[]).forEach(function(m){if(m.SizeMb>=5120){sel.add(m.Id);count++;}});
+(rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.SizeMb>=5120){sel.add(e.Id);count++;}});});});
+if(count===0){Dashboard.alert('5GB+ dosya bulunamadi.');ucnt();return;}
+applyFilterSelection('FilterSize','5120');
+Dashboard.alert(count+' buyuk dosya secildi. "Secilenleri Kodla" butonuna basin.');
+};
+
+function applyFilterSelection(selectId,value){
+document.getElementById(selectId).value=value;
+applyFiltersAndRender();
+}
 });
 })();
 </script>

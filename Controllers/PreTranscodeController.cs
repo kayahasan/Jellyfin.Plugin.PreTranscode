@@ -46,6 +46,16 @@ public class NonStandardItemsResponse
 public class EncodeRequestDto
 {
     public List<Guid> ItemIds { get; set; } = new();
+    public bool ForceReencode { get; set; } // Zaten hedef codec'te olsa bile yeniden kodla
+}
+
+public class EncodePreviewDto
+{
+    public int TotalItems { get; set; }
+    public int ToEncode { get; set; }
+    public int AlreadyTargetCodec { get; set; }
+    public double TotalSizeMb { get; set; }
+    public List<string> SkippedItems { get; set; } = new();
 }
 
 [ApiController]
@@ -106,12 +116,8 @@ public class PreTranscodeController : ControllerBase
                 continue;
             }
 
-            // Hedef codec'te ise atla
-            if (config.SkipIfAlreadyTargetCodec && IsAlreadyTargetCodec(item, config))
-            {
-                continue;
-            }
-
+            // Hedef codec'te olup olmadığını kontrol et ama listeden çıkarma
+            // Kullanıcı filtre ile seçebilir, encode sırasında tekrar kontrol edilir
             var videoStream = item.GetMediaStreams()?.FirstOrDefault(s => s.Type == MediaStreamType.Video);
             var resolution = GetResolution(videoStream);
 
@@ -189,6 +195,8 @@ return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
     public ActionResult Encode([FromBody] EncodeRequestDto request)
     {
         var config = Plugin.Instance!.Configuration;
+        var queued = new List<Guid>();
+        var skipped = new List<string>();
 
         foreach (var itemId in request.ItemIds)
         {
@@ -198,10 +206,57 @@ return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
                 continue;
             }
 
+            // Zaten hedef codec'te mi?
+            if (!request.ForceReencode && IsAlreadyTargetCodec(item, config))
+            {
+                skipped.Add($"{item.Name} (zaten {config.TargetVideoCodec.ToUpper()})");
+                continue;
+            }
+
             _jobQueueService.Enqueue(item.Id, item.Name, item.Path, config);
+            queued.Add(itemId);
         }
 
-        return Ok(new { queued = request.ItemIds.Count });
+        return Ok(new { queued = queued.Count, skippedCount = skipped.Count, skipped });
+    }
+
+    [HttpPost("EncodePreview")]
+    public ActionResult<EncodePreviewDto> EncodePreview([FromBody] EncodeRequestDto request)
+    {
+        var config = Plugin.Instance!.Configuration;
+        var preview = new EncodePreviewDto();
+        var toEncode = new List<Guid>();
+
+        foreach (var itemId in request.ItemIds)
+        {
+            var item = _libraryManager.GetItemById(itemId);
+            if (item is null || string.IsNullOrEmpty(item.Path))
+            {
+                continue;
+            }
+
+            preview.TotalItems++;
+
+            try
+            {
+                var fileSize = new System.IO.FileInfo(item.Path).Length;
+                preview.TotalSizeMb += fileSize / 1024.0 / 1024.0;
+            }
+            catch { }
+
+            if (IsAlreadyTargetCodec(item, config))
+            {
+                preview.AlreadyTargetCodec++;
+                preview.SkippedItems.Add($"{item.Name} (zaten {config.TargetVideoCodec.ToUpper()})");
+            }
+            else
+            {
+                toEncode.Add(itemId);
+            }
+        }
+
+        preview.ToEncode = toEncode.Count;
+        return Ok(preview);
     }
 
     [HttpPost("Cancel/{itemId}")]
