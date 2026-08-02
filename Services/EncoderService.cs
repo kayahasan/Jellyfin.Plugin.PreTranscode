@@ -360,8 +360,9 @@ public class EncoderService
             var needsFormatConvert = Is10BitFormat(sourcePixFmt) && config.TargetVideoCodec == "h264";
             if (needsFormatConvert)
             {
-                videoFilters.Append("format=nv12,");
-                _logger.LogInformation("PreTranscode: 10-bit kaynak ({PixFmt}) -> nv12 format donusumu eklendi", sourcePixFmt);
+                // VAAPI frame'ler GPU'da - format filter'i vaapi formatinda olmalı
+                videoFilters.Append("format=nv12|vaapi,");
+                _logger.LogInformation("PreTranscode: 10-bit kaynak ({PixFmt}) -> nv12|vaapi format donusumu eklendi", sourcePixFmt);
             }
 
             // MaxWidth scale filtresi
