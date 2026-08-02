@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.15",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.15/PreTranscode_1.0.0.15.zip",
+        "checksum": "DCC266238E56CDB2BFF57D279FF407FC",
+        "changelog": "Fix VAAPI h264 encoding on AMD GPUs - use hwdownload+format=nv12+hwupload for 10-bit to 8-bit conversion",
+        "timestamp": "2026-08-02T13:28:00Z"
+      },
+      {
         "version": "1.0.0.14",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.14/PreTranscode_1.0.0.14.zip",
@@ -38,14 +46,6 @@
         "checksum": "3E9386BB9E2277A8B3BBD796579E9B3D",
         "changelog": "Fix renderJobs scope error, episode sort crash, robust error handling - page loads correctly",
         "timestamp": "2026-08-02T12:30:00Z"
-      },
-      {
-        "version": "1.0.0.10",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.10/PreTranscode_1.0.0.10.zip",
-        "checksum": "F4F4D49DC9DAF6798433B3F3106064C4",
-        "changelog": "Fix episode sort crash and render error handling",
-        "timestamp": "2026-08-01T18:00:00Z"
       }
     ]
   }
