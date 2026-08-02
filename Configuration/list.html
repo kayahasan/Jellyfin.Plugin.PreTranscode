@@ -706,7 +706,7 @@ Dashboard.hideLoadingMsg();
 var totalSizeMb=r.TotalSizeMb||0;
 var totalSizeGb=(totalSizeMb/1024).toFixed(1);
 var estSavedGb=(totalSizeGb*0.4).toFixed(1); // Yaklasik %40 tasarruf
-var html='<div style="padding:1em;max-width:500px;">';
+var html='<div style="padding:1em;">';
 html+='<h3 style="margin-top:0;color:#e50914;">&#128230; Kodlama Onizlemesi</h3>';
 html+='<p style="color:#ccc;">Toplam: <b>'+r.TotalItems+'</b> dosya (<b>'+totalSizeGb+' GB</b>)</p>';
 html+='<p style="color:#30d158;">Kodlanacak: <b>'+r.ToEncode+'</b> dosya</p>';
@@ -725,14 +725,25 @@ html+='<button id="PreviewCancel" is="emby-button" class="button-flat">Iptal</bu
 html+='<button id="PreviewConfirm" is="emby-button" class="raised button-submit">Kodlamaya Basla</button>';
 html+='</div></div>';
 
-var dlg=Dashboard.createDialog({title:'',html:html,scrollY:false});
-$(dlg.getModal()).css('maxWidth','550px');
-Dashboard.openDialog(dlg);
+var dlg = {
+    title: '',
+    html: html,
+    scrollY: false
+};
 
-$(dlg.getModal()).on('click','#PreviewCancel',function(){Dashboard.closeDialog(dlg);});
-$(dlg.getModal()).on('click','#PreviewConfirm',function(){
-Dashboard.closeDialog(dlg);
-encodeItems(ids);
+require(['dialog'], function (Dialog) {
+    var dialogInstance = new Dialog(dlg);
+    dialogInstance.on('open', function() {
+        $(dialogInstance.getModal()).css('maxWidth', '550px');
+        $(dialogInstance.getModal()).find('#PreviewCancel').off('click').on('click', function() {
+            dialogInstance.close();
+        });
+        $(dialogInstance.getModal()).find('#PreviewConfirm').off('click').on('click', function() {
+            dialogInstance.close();
+            encodeItems(ids);
+        });
+    });
+    dialogInstance.open();
 });
 })
 .catch(function(e){
