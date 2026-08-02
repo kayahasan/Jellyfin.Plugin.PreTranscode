@@ -1,7 +1,13 @@
 <html lang="tr">
 <head><meta charset="utf-8"><title>PreTranscode</title></head>
 <body>
-<style>
+<script>
+(function(){
+var s=document.createElement('style');
+s.textContent=CSS_TEXT;
+document.head.appendChild(s);
+})();
+var CSS_TEXT=`
 #PreTranscodeListPage {
     --pt-accent: var(--accent-color, #e50914);
     --pt-text: var(--text-primary, #eee);
@@ -141,7 +147,8 @@
 .pt-empty { text-align: center; padding: 3em; color: var(--pt-text-dim); }
 .pt-empty-icon { font-size: 2.5em; color: #30d158; margin-bottom: .5em; }
 .pt-error { text-align: center; padding: 2em; color: #ff6b6b; }
-</style>
+`;
+</script>
 <div id="PreTranscodeListPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
 <div data-role="content">
 <div class="content-primary">
