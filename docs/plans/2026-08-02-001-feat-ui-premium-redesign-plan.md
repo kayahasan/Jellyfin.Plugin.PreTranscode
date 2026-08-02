@@ -88,13 +88,26 @@ Bu plan, tüm bu eksikleri gidererek plugin'i "premium" kategorideki Jellyfin ek
 
 ---
 
+## Release Strategy
+
+**One feature per version.** Each implementation unit (or small group) gets its own version:
+- Implement → test → build → tag → manifest update → release
+- User can update incrementally via Jellyfin dashboard
+- If a version breaks something, easy to identify and fix
+
+Example:
+- v1.0.0.16: Three-tab layout + Jobs tab
+- v1.0.0.17: Enhanced JobInfo + job panel
+- v1.0.0.18: Filters and sorting
+- etc.
+
 ## Key Technical Decisions
 
 - **Single page, enhanced tabs**: Keep single-page architecture but add a third "Jobs" tab for dedicated job management
 - **No dashboard home card**: Use Activity Log integration instead (plugin-scope solution)
 - **Encoder type display over GPU metrics**: Show "h264_vaapi (AMD Vega 64)" instead of fake GPU % (honest, useful)
 - **ETA from progress rate**: Calculate ETA from file growth rate (already tracked), not system-level metrics
-- **CSS via `<style>` block**: Move inline CSS to scoped `<style>` block (not external file, keeps single embedded resource)
+- **Keep inline CSS**: Jellyfin reads inline CSS properly, external CSS doesn't load. Design breaks without inline styles.
 - **Preview dialog before bulk encode**: Show estimated sizes, count, duration before starting
 
 ---
@@ -181,7 +194,9 @@ Bu plan, tüm bu eksikleri gidererek plugin'i "premium" kategorideki Jellyfin ek
 - Modify: `Configuration/list.html`
 
 **Approach:**
-- Extract all inline `style=""` attributes to a `<style>` block scoped to `#PreTranscodeListPage`
+- Keep inline CSS (Jellyfin requirement - external CSS doesn't load properly)
+- Refine inline styles for better visual consistency
+- Use Jellyfin CSS variables where possible within inline styles
 - Replace custom card markup with proper Jellyfin card structure (`card scalableCard visualCardBox`)
 - Use Jellyfin layout classes: `verticalSection`, `selectContainer`, `inputContainer`, `checkboxContainer`
 - Use Jellyfin CSS variables: `--accent-color`, `--text-primary`, `--background-primary`

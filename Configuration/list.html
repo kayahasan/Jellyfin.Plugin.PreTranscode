@@ -1,189 +1,55 @@
 <html lang="tr">
 <head><meta charset="utf-8"><title>PreTranscode</title></head>
 <body>
-<script>
-(function(){
-var s=document.createElement('style');
-s.textContent=CSS_TEXT;
-document.head.appendChild(s);
-})();
-var CSS_TEXT=`
-#PreTranscodeListPage {
-    --pt-accent: var(--accent-color, #e50914);
-    --pt-text: var(--text-primary, #eee);
-    --pt-text-dim: var(--text-secondary, #888);
-    --pt-bg: var(--background-primary, #141414);
-    --pt-border: #333;
-}
-.pt-hero { margin-bottom: 1.5em; }
-.pt-hero h2 { color: var(--pt-accent); margin-bottom: .3em; }
-.pt-hero p { color: var(--pt-text-dim); }
-.pt-tabs {
-    display: flex; gap: 0; margin-bottom: 1.5em;
-    border-bottom: 2px solid var(--pt-border);
-}
-.pt-tab {
-    flex: 1; padding: .7em; border: none; background: transparent;
-    color: var(--pt-text-dim); font-weight: 400; font-size: .95em;
-    cursor: pointer; border-bottom: 2px solid transparent;
-    margin-bottom: -2px; transition: all .2s;
-}
-.pt-tab.active { color: var(--pt-accent); font-weight: 700; border-bottom-color: var(--pt-accent); }
-.pt-tab:hover { color: var(--pt-text); }
-.pt-panel { display: none; }
-.pt-panel.active { display: block; }
-.pt-toolbar {
-    display: flex; gap: .5em; margin-bottom: 1em;
-    flex-wrap: wrap; align-items: center;
-}
-.pt-toolbar-right { margin-left: auto; display: flex; align-items: center; gap: .5em; }
-.pt-sel-count { color: var(--pt-text-dim); font-size: .85em; }
-.pt-job-panel { margin-bottom: 1em; }
-.pt-job-card {
-    background: rgba(255,255,255,.03); border: 1px solid var(--pt-border);
-    border-radius: 8px; padding: .75em;
-}
-.pt-job-header {
-    font-size: .85em; font-weight: 600; color: var(--pt-text-dim);
-    margin-bottom: .5em; display: flex; align-items: center; gap: .5em;
-}
-.pt-job-row {
-    display: flex; align-items: center; gap: .5em;
-    padding: .5em 0; border-bottom: 1px solid rgba(255,255,255,.04);
-}
-.pt-job-row:last-child { border-bottom: none; }
-.pt-status-icon { font-size: 1.1em; width: 20px; text-align: center; flex-shrink: 0; }
-.pt-job-info { flex: 1; min-width: 0; }
-.pt-job-title-row { display: flex; justify-content: space-between; align-items: center; }
-.pt-job-name { font-size: .85em; color: var(--pt-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pt-job-pct { font-size: .8em; color: var(--pt-text-dim); font-weight: 600; }
-.pt-progress-bar {
-    height: 6px; background: rgba(255,255,255,.08);
-    border-radius: 3px; margin-top: .35em; overflow: hidden;
-}
-.pt-progress-fill {
-    height: 100%; border-radius: 3px; transition: width .5s ease;
-}
-.pt-progress-fill.running {
-    background: linear-gradient(90deg, #30d158, #00c853);
-    animation: pt-pulse 2s ease-in-out infinite;
-}
-@keyframes pt-pulse { 0%,100% { opacity: 1; } 50% { opacity: .8; } }
-.pt-job-meta {
-    display: flex; justify-content: space-between; margin-top: .2em;
-    font-size: .72em; color: var(--pt-text-dim); flex-wrap: wrap; gap: .3em;
-}
-.pt-badge {
-    padding: .1em .4em; border-radius: 3px; font-size: .7em;
-    font-weight: 600; text-transform: uppercase;
-}
-.pt-badge-gpu { background: rgba(48,209,88,.15); color: #30d158; }
-.pt-badge-cpu { background: rgba(255,255,255,.08); color: #888; }
-.pt-badge-codec { background: rgba(255,255,255,.1); color: #ccc; }
-.pt-cancel-btn {
-    background: rgba(255,107,107,.2); border: 1px solid #ff6b6b;
-    color: #ff6b6b; padding: 2px 8px; border-radius: 4px;
-    cursor: pointer; font-size: .75em; margin-left: .5em;
-}
-.pt-cancel-btn:hover { background: rgba(255,107,107,.4); }
-.pt-summary {
-    background: rgba(48,209,88,.05); border: 1px solid rgba(48,209,88,.2);
-    border-radius: 8px; padding: .75em; margin-bottom: 1em;
-    display: flex; align-items: center; gap: 1em; flex-wrap: wrap;
-}
-.pt-summary-item { font-size: .85em; color: var(--pt-text-dim); }
-.pt-summary-item strong { color: var(--pt-text); }
-.pt-summary-saved { color: #30d158; font-weight: 600; }
-.pt-movie-card {
-    display: inline-block; width: 140px; margin: .35em;
-    vertical-align: top; cursor: pointer; position: relative;
-}
-.pt-movie-card.pt-sel .pt-card-box { box-shadow: 0 0 0 2px var(--pt-accent); }
-.pt-card-box { border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.3); }
-.pt-card-img { aspect-ratio: 2/3; width: 100%; object-fit: cover; }
-.pt-card-footer { padding: .4em; }
-.pt-card-title { font-size: .95em; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pt-card-meta { font-size: .9em; color: var(--pt-text-dim); margin-top: .15em; }
-.pt-check {
-    position: absolute; top: .3em; right: .3em; width: 22px; height: 22px;
-    border-radius: 50%; background: rgba(0,0,0,.6); border: 2px solid rgba(255,255,255,.3);
-    display: flex; align-items: center; justify-content: center;
-    color: transparent; font-size: 12px; z-index: 5; transition: all .15s;
-}
-.pt-check.selected { background: var(--pt-accent); border-color: var(--pt-accent); color: #fff; }
-.pt-series { margin-bottom: 1em; border: 1px solid var(--pt-border); border-radius: 8px; overflow: hidden; }
-.pt-series-hdr {
-    display: flex; align-items: center; gap: .75em; padding: .75em;
-    cursor: pointer; background: rgba(255,255,255,.03);
-}
-.pt-series-poster { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
-.pt-series-body { padding: .5em .75em; }
-.pt-season { padding: .5em 0; border-bottom: 1px solid rgba(255,255,255,.04); }
-.pt-season:last-child { border-bottom: none; }
-.pt-season-title { font-size: .82em; font-weight: 600; color: var(--pt-text-dim); margin-bottom: .35em; }
-.pt-ep-row {
-    display: flex; align-items: center; gap: .5em; padding: .4em;
-    border-radius: 4px; cursor: pointer; font-size: .9em; transition: background .1s;
-}
-.pt-ep-row:hover { background: rgba(255,255,255,.04); }
-.pt-ep-row.pt-sel { background: rgba(229,9,20,.12); }
-.pt-ep-check {
-    width: 18px; height: 18px; border-radius: 3px;
-    border: 2px solid rgba(255,255,255,.2); display: flex;
-    align-items: center; justify-content: center; color: transparent;
-    font-size: 10px; flex-shrink: 0; transition: all .15s;
-}
-.pt-ep-check.selected { background: var(--pt-accent); border-color: var(--pt-accent); color: #fff; }
-.pt-ep-name { flex: 1; color: var(--pt-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pt-ep-meta { flex-shrink: 0; color: var(--pt-text-dim); text-align: right; }
-.pt-section-title {
-    font-size: .9em; font-weight: 600; color: var(--pt-text-dim);
-    margin-bottom: .75em; display: flex; align-items: center; gap: .5em;
-}
-.pt-section-count {
-    font-size: .85em; padding: .1em .4em; border-radius: 8px;
-    background: rgba(255,255,255,.08); color: var(--pt-text-dim); font-weight: 400;
-}
-.pt-empty { text-align: center; padding: 3em; color: var(--pt-text-dim); }
-.pt-empty-icon { font-size: 2.5em; color: #30d158; margin-bottom: .5em; }
-.pt-error { text-align: center; padding: 2em; color: #ff6b6b; }
-`;
-</script>
 <div id="PreTranscodeListPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
 <div data-role="content">
 <div class="content-primary">
 
-<div class="pt-hero">
+<div class="heroDescription" id="PtHero">
 <h2>PreTranscode</h2>
 <p>Uyumsuz dosyalar&#305; bulun, se&#305;in ve kodlay&#305;n</p>
 </div>
 
-<div class="pt-tabs">
-<button class="pt-tab active" data-tab="library">&#127916; K&#252;t&#252;phane</button>
-<button class="pt-tab" data-tab="jobs">&#9998; &#73;&#351;ler</button>
-<button class="pt-tab" data-tab="settings">&#9881; Ayarlar</button>
+<div id="PtTabs" class="flex align-items-center" style="gap:0;margin-bottom:1.5em;border-bottom:2px solid #333;">
+<button id="TabLibrary" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#e50914;font-weight:700;font-size:.95em;cursor:pointer;border-bottom:2px solid #e50914;margin-bottom:-2px;transition:all .2s;">
+&#127916; K&#252;t&#252;phane</button>
+<button id="TabJobs" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#888;font-weight:400;font-size:.95em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;">
+&#128202; &#304;&#351;ler</button>
+<button id="TabSettings" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#888;font-weight:400;font-size:.95em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;">
+&#9881; Ayarlar</button>
 </div>
 
-<div id="PanelLibrary" class="pt-panel active">
-<div class="pt-toolbar">
-<button id="RefreshBtn" is="emby-button" class="button-flat">&#8635; Yenile</button>
-<button id="SelectAllBtn" is="emby-button" class="button-flat">&#9745; T&#252;m&#252;n&#252; Se&#305;</button>
-<button id="DeselectAllBtn" is="emby-button" class="button-flat">&#10008; Kald&#305;r</button>
-<div class="pt-toolbar-right">
-<span id="SelectedCount" class="pt-sel-count"></span>
-<button id="EncodeBtn" is="emby-button" class="raised button-submit">&#9654; Se&#305;ilenleri Kodla</button>
+<div id="PanelLibrary">
+<div style="display:flex;gap:.5em;margin-bottom:1em;flex-wrap:wrap;align-items:center;">
+<button id="RefreshBtn" is="emby-button" type="button" class="button-flat"><span>&#8635; Yenile</span></button>
+<button id="SelectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#9745; T&#252;m&#252;n&#252; Se&#305;</span></button>
+<button id="DeselectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#10008; Kald&#305;r</span></button>
+<div style="flex:1;"></div>
+<span id="SelectedCount" style="color:#888;font-size:.85em;"></span>
+<button id="EncodeBtn" is="emby-button" type="button" class="raised button-submit block"><span>&#9654; Se&#305;ilenleri Kodla</span></button>
 </div>
-</div>
-<div id="JobPanel" class="pt-job-panel"></div>
 <div id="LibraryContent"></div>
 </div>
 
-<div id="PanelJobs" class="pt-panel">
-<div id="JobsSummary" class="pt-summary" style="display:none;"></div>
-<div id="JobsList" class="pt-job-card"></div>
+<div id="PanelJobs" style="display:none;">
+<div id="JobSummary" style="display:none;margin-bottom:1em;background:rgba(255,255,255,.03);border:1px solid #333;border-radius:8px;padding:.75em;">
+<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">&#128202; &#304;&#351; &#351;zeti</div>
+<div style="display:flex;gap:1.5em;font-size:.85em;color:#ccc;">
+<span id="SummaryTotal"></span>
+<span id="SummaryCompleted"></span>
+<span id="SummaryRunning"></span>
+<span id="SummarySaved"></span>
+</div>
+</div>
+<div id="JobPanel" style="display:none;"></div>
+<div id="JobEmpty" style="text-align:center;padding:3em;color:#666;">
+<div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">&#9989;</div>
+<h3 style="color:#999;">Aktif i&#351; yok</h3>
+<p style="color:#666;">Kodlama i&#351;lemleri burada g&#246;recek.</p>
+</div>
 </div>
 
-<div id="PanelSettings" class="pt-panel">
+<div id="PanelSettings" style="display:none;">
 <form id="PreTranscodeConfigForm">
 <div class="verticalSection">
 <h3>Encoder</h3>
@@ -255,21 +121,53 @@ var pid="b3a1c9e4-6f2d-4a8b-9c3e-2d1f5a7b8c90";
 var sel=new Set();
 var jobInterval=null;
 
+
+
+// Job progress polling
 function pollJobs(){
 ApiClient.ajax({type:'GET',url:ApiClient.getUrl('Plugins/PreTranscode/Jobs')})
 .then(function(r){return r.json();})
-.then(function(jobs){renderJobs(jobs);renderJobsTab(jobs);});
+.then(function(jobs){renderJobs(jobs);});
 }
-
-function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
-function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
-function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
 
 function renderJobs(jobs){
 var p=document.getElementById('JobPanel');
-if(!jobs||!jobs.length){p.innerHTML='';return;}
-var html='<div class="pt-job-card">';
-html+='<div class="pt-job-header">&#9881; Aktif &#73;&#351;lemler</div>';
+var empty=document.getElementById('JobEmpty');
+var summary=document.getElementById('JobSummary');
+
+if(!jobs||!jobs.length){
+p.style.display='none';
+summary.style.display='none';
+empty.style.display='';
+return;
+}
+empty.style.display='none';
+p.style.display='';
+
+// Calculate summary
+var total=jobs.length;
+var completed=jobs.filter(function(j){return j.Status==='Completed';}).length;
+var running=jobs.filter(function(j){return j.Status==='Running';}).length;
+var queued=jobs.filter(function(j){return j.Status==='Queued';}).length;
+var failed=jobs.filter(function(j){return j.Status==='Failed';}).length;
+var totalSrc=0,totalOut=0;
+jobs.forEach(function(j){
+if(j.Status==='Completed'||j.Status==='Running'){
+totalSrc+=j.SourceSizeMb||0;
+totalOut+=j.OutputSizeMb||0;
+}
+});
+var savedPct=totalSrc>0?Math.round((1-totalOut/totalSrc)*100):0;
+
+// Update summary
+summary.style.display='';
+document.getElementById('SummaryTotal').textContent='&#128196; Toplam: '+total+' ('+running+' aktif, '+queued+' kuyrukta, '+completed+' tamamlandi'+(failed>0?', '+failed+' hata':'')+')';
+document.getElementById('SummaryCompleted').textContent='&#10004; Tamamlandi: '+completed;
+document.getElementById('SummaryRunning').textContent='&#9654; Aktif: '+running;
+document.getElementById('SummarySaved').textContent=totalOut>0?'&#128188; Tasarruf: '+fsize(totalSrc)+' &#8594; '+fsize(totalOut)+' ('+savedPct+'%)':'';
+
+var html='<div style="background:rgba(255,255,255,.03);border:1px solid #333;border-radius:8px;padding:.75em;">';
+html+='<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">&#9881; Islem Durumu</div>';
 jobs.forEach(function(j){
 var statusIcon,statusColor,statusText;
 if(j.Status==='Running'){statusIcon='&#9654;';statusColor='#30d158';statusText='Kodlaniyor...';}
@@ -277,40 +175,44 @@ else if(j.Status==='Queued'){statusIcon='&#9203;';statusColor='#f5c542';statusTe
 else if(j.Status==='Completed'){statusIcon='&#10004;';statusColor='#30d158';statusText='Tamamlandi';}
 else if(j.Status==='Cancelled'){statusIcon='&#9209;';statusColor='#f5c542';statusText=j.Error||'Iptal Edildi';}
 else{statusIcon='&#10006;';statusColor='#ff6b6b';statusText=j.Error||'Hata';}
+
 var pct=Math.round(j.ProgressPercent||0);
-var outMb=j.OutputSizeMb||0;var srcMb=j.SourceSizeMb||0;
-var sizeStr=outMb>0?fsize(outMb):'0MB';var srcStr=srcMb>0?fsize(srcMb):'?';
+var outMb=j.OutputSizeMb||0;
+var srcMb=j.SourceSizeMb||0;
+var sizeStr=outMb>0?(outMb>=1024?(outMb/1024).toFixed(2)+'GB':Math.round(outMb)+'MB'):'0MB';
+var srcStr=srcMb>0?(srcMb>=1024?(srcMb/1024).toFixed(2)+'GB':Math.round(srcMb)+'MB'):'?';
+
+// Cancel button
 var cancelBtn='';
 if(j.Status==='Running'){
-cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn">Iptal</button>';
+cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">Iptal</button>';
 }
-var encoderBadge='';
-if(j.EncoderType){
-var isGpu=j.EncoderType.includes('vaapi')||j.EncoderType.includes('qsv')||j.EncoderType.includes('nvenc')||j.EncoderType.includes('amf');
-encoderBadge='<span class="pt-badge '+(isGpu?'pt-badge-gpu':'pt-badge-cpu')+'">'+esc(j.EncoderType)+(isGpu?' (GPU)':' (CPU)')+'</span>';
-}
-var codecInfo='';
-if(j.CodecConversion){codecInfo='<span class="pt-badge pt-badge-codec">'+esc(j.CodecConversion)+'</span>';}
-var speedEta='';
-if(j.EncodeSpeedFps>0){speedEta=Math.round(j.EncodeSpeedFps)+'fps';}
-if(j.EtaText){speedEta+=(speedEta?' | ':'')+j.EtaText;}
-html+='<div class="pt-job-row">';
-html+='<span class="pt-status-icon" style="color:'+statusColor+'">'+statusIcon+'</span>';
-html+='<div class="pt-job-info">';
-html+='<div class="pt-job-title-row">';
-html+='<span class="pt-job-name">'+esc(j.Name)+'</span>';
-html+='<span class="pt-job-pct">'+pct+'%</span>'+cancelBtn;
+
+html+='<div style="display:flex;align-items:center;gap:.5em;padding:.5em 0;border-bottom:1px solid rgba(255,255,255,.04);">';
+html+='<span style="color:'+statusColor+';font-size:1.1em;width:20px;text-align:center;">'+statusIcon+'</span>';
+html+='<div style="flex:1;">';
+html+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+html+='<span style="font-size:.85em;color:#eee;">'+esc(j.Name)+'</span>';
+html+='<span style="font-size:.8em;color:#ccc;font-weight:600;">'+pct+'%</span>'+cancelBtn;
 html+='</div>';
-html+='<div class="pt-progress-bar"><div class="pt-progress-fill'+(j.Status==='Running'?' running':'')+'" style="width:'+pct+'%;background:'+statusColor+';"></div></div>';
-html+='<div class="pt-job-meta">';
+// Progress bar
+html+='<div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;margin-top:.35em;overflow:hidden;">';
+html+='<div style="height:100%;width:'+pct+'%;background:'+statusColor+';border-radius:3px;transition:width .5s ease;"></div>';
+html+='</div>';
+html+='<div style="display:flex;justify-content:space-between;margin-top:.2em;font-size:.72em;color:#888;">';
 html+='<span>'+sizeStr+' / '+srcStr+'</span>';
-html+='<span>'+codecInfo+encoderBadge+'</span>';
-html+='<span>'+speedEta+' '+statusText+'</span>';
+html+='<span>'+statusText+'</span>';
 html+='</div>';
-html+='</div></div>';
+html+='</div>';
+html+='</div>';
 });
 html+='</div>';
 p.innerHTML=html;
+
+// Keep polling if there are running/queued jobs
+var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
+if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;}
+// Bind cancel buttons
 p.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
 btn.onclick=function(){
 var jobId=this.getAttribute('data-cancel-id');
@@ -318,103 +220,39 @@ if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+jobId)});
 };
 });
-var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
-if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;}
 }
 
-function renderJobsTab(jobs){
-var summary=document.getElementById('JobsSummary');
-var list=document.getElementById('JobsList');
-if(!jobs||!jobs.length){
-summary.style.display='none';
-list.innerHTML='<div class="pt-empty"><div class="pt-empty-icon">&#9881;</div><h3>Henüz işlem yok</h3><p>Dosyalar secip kodlamaya baslayin</p></div>';
-return;
+// Tabs
+function showTab(t){
+var lb=document.getElementById('TabLibrary');
+var jb=document.getElementById('TabJobs');
+var sb=document.getElementById('TabSettings');
+var pl=document.getElementById('PanelLibrary');
+var pj=document.getElementById('PanelJobs');
+var ps=document.getElementById('PanelSettings');
+pl.style.display='none';pj.style.display='none';ps.style.display='none';
+lb.style.color='#888';lb.style.fontWeight='400';lb.style.borderBottomColor='transparent';
+jb.style.color='#888';jb.style.fontWeight='400';jb.style.borderBottomColor='transparent';
+sb.style.color='#888';sb.style.fontWeight='400';sb.style.borderBottomColor='transparent';
+if(t==='l'){
+pl.style.display='';
+lb.style.color='#e50914';lb.style.fontWeight='700';lb.style.borderBottomColor='#e50914';
+}else if(t==='j'){
+pj.style.display='';
+jb.style.color='#e50914';jb.style.fontWeight='700';jb.style.borderBottomColor='#e50914';
+}else{
+ps.style.display='';
+sb.style.color='#e50914';sb.style.fontWeight='700';sb.style.borderBottomColor='#e50914';
+loadCfg();
 }
-var running=0,queued=0,completed=0,failed=0,cancelled=0;
-var totalSrc=0,totalOut=0;
-jobs.forEach(function(j){
-if(j.Status==='Running')running++;
-else if(j.Status==='Queued')queued++;
-else if(j.Status==='Completed')completed++;
-else if(j.Status==='Failed')failed++;
-else if(j.Status==='Cancelled')cancelled++;
-totalSrc+=j.SourceSizeMb||0;
-totalOut+=j.OutputSizeMb||0;
-});
-var saved=0;
-if(completed>0&&totalSrc>0&&totalOut>0){
-saved=Math.round((1-totalOut/totalSrc)*100);
 }
-summary.style.display='flex';
-summary.innerHTML=
-'<div class="pt-summary-item">&#9998; Toplam: <strong>'+jobs.length+'</strong></div>'+
-'<div class="pt-summary-item">&#9654; Kodlaniyor: <strong>'+running+'</strong></div>'+
-'<div class="pt-summary-item">&#9203; Kuyrukta: <strong>'+queued+'</strong></div>'+
-'<div class="pt-summary-item">&#10004; Tamamlandi: <strong>'+completed+'</strong></div>'+
-(failed>0?'<div class="pt-summary-item" style="color:#ff6b6b;">&#10006; Hata: <strong>'+failed+'</strong></div>':'')+
-(completed>0?'<div class="pt-summary-item pt-summary-saved">&#128190; Tasarruf: '+fsize(totalSrc)+' → '+fsize(totalOut)+' ('+saved+'%)</div>':'');
-var html='<div class="pt-job-header">&#9998; Tüm &#73;&#351;lemler</div>';
-jobs.forEach(function(j){
-var statusIcon,statusColor,statusText;
-if(j.Status==='Running'){statusIcon='&#9654;';statusColor='#30d158';statusText='Kodlaniyor...';}
-else if(j.Status==='Queued'){statusIcon='&#9203;';statusColor='#f5c542';statusText='Kuyrukta';}
-else if(j.Status==='Completed'){statusIcon='&#10004;';statusColor='#30d158';statusText='Tamamlandi';}
-else if(j.Status==='Cancelled'){statusIcon='&#9209;';statusColor='#f5c542';statusText=j.Error||'Iptal Edildi';}
-else{statusIcon='&#10006;';statusColor='#ff6b6b';statusText=j.Error||'Hata';}
-var pct=Math.round(j.ProgressPercent||0);
-var outMb=j.OutputSizeMb||0;var srcMb=j.SourceSizeMb||0;
-var sizeStr=outMb>0?fsize(outMb):'0MB';var srcStr=srcMb>0?fsize(srcMb):'?';
-var cancelBtn='';
-if(j.Status==='Running'){
-cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn">Iptal</button>';
-}
-var encoderBadge='';
-if(j.EncoderType){
-var isGpu=j.EncoderType.includes('vaapi')||j.EncoderType.includes('qsv')||j.EncoderType.includes('nvenc')||j.EncoderType.includes('amf');
-encoderBadge='<span class="pt-badge '+(isGpu?'pt-badge-gpu':'pt-badge-cpu')+'">'+esc(j.EncoderType)+(isGpu?' (GPU)':' (CPU)')+'</span>';
-}
-var codecInfo='';
-if(j.CodecConversion){codecInfo='<span class="pt-badge pt-badge-codec">'+esc(j.CodecConversion)+'</span>';}
-var speedEta='';
-if(j.EncodeSpeedFps>0){speedEta=Math.round(j.EncodeSpeedFps)+'fps';}
-if(j.EtaText){speedEta+=(speedEta?' | ':'')+j.EtaText;}
-html+='<div class="pt-job-row">';
-html+='<span class="pt-status-icon" style="color:'+statusColor+'">'+statusIcon+'</span>';
-html+='<div class="pt-job-info">';
-html+='<div class="pt-job-title-row">';
-html+='<span class="pt-job-name">'+esc(j.Name)+'</span>';
-html+='<span class="pt-job-pct">'+pct+'%</span>'+cancelBtn;
-html+='</div>';
-html+='<div class="pt-progress-bar"><div class="pt-progress-fill'+(j.Status==='Running'?' running':'')+'" style="width:'+pct+'%;background:'+statusColor+';"></div></div>';
-html+='<div class="pt-job-meta">';
-html+='<span>'+sizeStr+' / '+srcStr+'</span>';
-html+='<span>'+codecInfo+encoderBadge+'</span>';
-html+='<span>'+speedEta+' '+statusText+'</span>';
-html+='</div>';
-html+='</div></div>';
-});
-list.innerHTML=html;
-list.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
-btn.onclick=function(){
-var jobId=this.getAttribute('data-cancel-id');
-if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
-ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+jobId)});
-};
-});
-}
+document.getElementById('TabLibrary').onclick=function(){showTab('l');};
+document.getElementById('TabJobs').onclick=function(){showTab('j');};
+document.getElementById('TabSettings').onclick=function(){showTab('s');};
 
-document.querySelectorAll('.pt-tab').forEach(function(tab){
-tab.onclick=function(){
-document.querySelectorAll('.pt-tab').forEach(function(t){t.classList.remove('active');});
-document.querySelectorAll('.pt-panel').forEach(function(p){p.classList.remove('active');});
-this.classList.add('active');
-var t=this.getAttribute('data-tab');
-if(t==='library')document.getElementById('PanelLibrary').classList.add('active');
-else if(t==='jobs')document.getElementById('PanelJobs').classList.add('active');
-else if(t==='settings'){document.getElementById('PanelSettings').classList.add('active');loadCfg();}
-};
-});
-
+function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
+function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
+function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
 function ucnt(){document.getElementById('SelectedCount').textContent=sel.size>0?sel.size+' secili':'';}
 function tog(id,el){
 if(sel.has(id)){sel.delete(id);el.classList.remove('pt-sel');}
@@ -422,132 +260,235 @@ else{sel.add(id);el.classList.add('pt-sel');}
 ucnt();
 }
 
+// Movie card - uses Jellyfin card component
 function mkMovie(item){
 var card=document.createElement('div');
-card.className='pt-movie-card';
+card.style.cssText='display:inline-block;width:140px;margin:.35em;vertical-align:top;cursor:pointer;position:relative;';
 card.setAttribute('data-id',item.Id);
-var box=document.createElement('div');box.className='pt-card-box';
-var img=document.createElement('img');img.className='pt-card-img';
-if(item.PosterUrl){img.src=purl(item.PosterUrl);img.onerror=function(){this.style.display='none';};}
-else{img.style.display='none';}
-box.appendChild(img);
-var ft=document.createElement('div');ft.className='pt-card-footer';
-var tn=document.createElement('div');tn.className='pt-card-title';tn.textContent=item.Name;
+
+// Card wrapper like Jellyfin
+var cw=document.createElement('div');
+cw.className='card scalableCard';
+cw.style.cssText='width:140px;';
+
+// Overlay checkbox
+var ov=document.createElement('div');
+ov.className='cardBox visualCardBox';
+ov.style.cssText='position:relative;';
+
+// Image container
+var ic=document.createElement('div');
+ic.className='cardScalableImageAspect';
+ic.style.cssText='aspect-ratio:2/3;';
+
+var img=document.createElement('img');
+img.className='cardPadder cardPadder-home scalableImageOnTop';
+img.style.cssText='width:100%;height:100%;object-fit:cover;display:block;';
+if(item.PosterUrl){
+img.src=purl(item.PosterUrl);
+img.onerror=function(){this.style.display='none';};
+}else{img.style.display='none';}
+ic.appendChild(img);
+ov.appendChild(ic);
+
+// Footer
+var ft=document.createElement('div');
+ft.className='cardFooter';
+ft.style.cssText='padding:.4em;';
+var tn=document.createElement('div');
+tn.className='cardText';
+tn.style.cssText='font-size:.95em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+tn.textContent=item.Name;
 ft.appendChild(tn);
-var mt=document.createElement('div');mt.className='pt-card-meta';
+var mt=document.createElement('div');
+mt.style.cssText='font-size:.9em;color:#ccc;margin-top:.15em;';
 mt.textContent=fsize(item.SizeMb)+' | '+item.Codec.toUpperCase();
 ft.appendChild(mt);
-box.appendChild(ft);
-card.appendChild(box);
-var ch=document.createElement('div');ch.className='pt-check';ch.textContent='\u2713';
-box.appendChild(ch);
+ov.appendChild(ft);
+
+cw.appendChild(ov);
+card.appendChild(cw);
+
+// Selection overlay
+var ch=document.createElement('div');
+ch.className='cardOverlayButton cardOverlayBottomBrand';
+ch.style.cssText='position:absolute;top:.3em;right:.3em;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;color:transparent;font-size:12px;z-index:5;transition:all .15s;';
+ch.textContent='\u2713';
+cw.querySelector('.cardBox').appendChild(ch);
+
 card.onclick=function(){
 tog(item.Id,card);
-if(sel.has(item.Id))ch.classList.add('selected');
-else ch.classList.remove('selected');
+if(sel.has(item.Id)){
+ch.style.background='#e50914';ch.style.borderColor='#e50914';ch.style.color='#fff';
+}else{
+ch.style.background='rgba(0,0,0,.6)';ch.style.borderColor='rgba(255,255,255,.3)';ch.style.color='transparent';
+}
 };
+
 return card;
 }
 
+// Series accordion
 function mkSeries(si){
-var wrap=document.createElement('div');wrap.className='pt-series';
-var hdr=document.createElement('div');hdr.className='pt-series-hdr';
-var sp=document.createElement('img');sp.className='pt-series-poster';
+var wrap=document.createElement('div');
+wrap.style.cssText='margin-bottom:1em;border:1px solid #333;border-radius:8px;overflow:hidden;';
+
+var hdr=document.createElement('div');
+hdr.style.cssText='display:flex;align-items:center;gap:.75em;padding:.75em;cursor:pointer;background:rgba(255,255,255,.03);';
+
+var sp=document.createElement('img');
+sp.style.cssText='width:40px;height:60px;object-fit:cover;border-radius:4px;flex-shrink:0;';
 if(si.PosterUrl){sp.src=purl(si.PosterUrl);sp.onerror=function(){this.style.display='none';};}
 else{sp.style.display='none';}
 hdr.appendChild(sp);
-var st=document.createElement('div');st.style.flex='1';
+
+var st=document.createElement('div');
+st.style.cssText='flex:1;';
 st.innerHTML='<div style="font-weight:600;font-size:.92em;">'+esc(si.Name)+'</div>';
 var epc=0;(si.Seasons||[]).forEach(function(s){epc+=s.Episodes.length;});
 st.innerHTML+='<div style="font-size:.78em;color:#888;">'+epc+' bolum</div>';
 hdr.appendChild(st);
-var arr=document.createElement('span');arr.style.color='#666';arr.textContent='\u25b6';
+
+var arr=document.createElement('span');
+arr.style.cssText='color:#666;font-size:1.2em;transition:transform .2s;';
+arr.textContent='\u25b6';
 hdr.appendChild(arr);
-var body=document.createElement('div');body.style.display='none';body.className='pt-series-body';
+
+var body=document.createElement('div');
+body.style.display='none';
+
+// Select all
 var sa=document.createElement('div');
 sa.style.cssText='padding:.4em .75em;border-bottom:1px solid #222;display:flex;align-items:center;gap:.4em;font-size:.82em;color:#999;';
 sa.innerHTML='<input type="checkbox" class="pt-sa" /> Tum bolimleri sec';
 body.appendChild(sa);
+
 (si.Seasons||[]).forEach(function(season){
-var sd=document.createElement('div');sd.className='pt-season';
-var st2=document.createElement('div');st2.className='pt-season-title';
+var sd=document.createElement('div');
+sd.style.cssText='padding:.5em .75em .5em 2em;border-bottom:1px solid rgba(255,255,255,.04);';
+var st2=document.createElement('div');
+st2.style.cssText='font-size:.82em;font-weight:600;color:#aaa;margin-bottom:.35em;';
 st2.textContent='Sezon '+season.SeasonNumber+' ('+season.Episodes.length+')';
 sd.appendChild(st2);
+
 season.Episodes.forEach(function(ep){
-var r=document.createElement('div');r.className='pt-ep-row';r.setAttribute('data-id',ep.Id);
-var ck=document.createElement('div');ck.className='pt-ep-check';ck.textContent='\u2713';
+var r=document.createElement('div');
+r.style.cssText='display:flex;align-items:center;gap:.5em;padding:.4em .4em;border-radius:4px;cursor:pointer;font-size:.9em;transition:background .1s;';
+r.setAttribute('data-id',ep.Id);
+r.onmouseover=function(){r.style.background='rgba(255,255,255,.04)';};
+r.onmouseout=function(){if(!sel.has(ep.Id))r.style.background='';};
+
+var ck=document.createElement('div');
+ck.style.cssText='width:18px;height:18px;border-radius:3px;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:transparent;font-size:10px;flex-shrink:0;transition:all .15s;';
+ck.textContent='\u2713';
 r.appendChild(ck);
-var nm=document.createElement('div');nm.className='pt-ep-name';nm.textContent=ep.Name;
+
+var nm=document.createElement('div');
+nm.style.cssText='flex:1;color:#eee;font-size:.95em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+nm.textContent=ep.Name;
 r.appendChild(nm);
-var me=document.createElement('div');me.className='pt-ep-meta';
-me.innerHTML=fsize(ep.SizeMb)+' <span class="pt-badge pt-badge-codec">'+esc(ep.Codec)+'</span>';
+
+var me=document.createElement('div');
+me.style.cssText='flex-shrink:0;font-size:.9em;color:#ccc;text-align:right;';
+me.innerHTML=fsize(ep.SizeMb)+' <span style="background:rgba(255,255,255,.1);padding:.15em .4em;border-radius:3px;margin-left:.3em;text-transform:uppercase;font-weight:600;">'+esc(ep.Codec)+'</span>';
 r.appendChild(me);
+
 r.onclick=function(){
 tog(ep.Id,r);
-if(sel.has(ep.Id))ck.classList.add('selected');
-else ck.classList.remove('selected');
+if(sel.has(ep.Id)){
+ck.style.background='#e50914';ck.style.borderColor='#e50914';ck.style.color='#fff';
+r.style.background='rgba(229,9,20,.12)';
+}else{
+ck.style.background='';ck.style.borderColor='rgba(255,255,255,.2)';ck.style.color='transparent';
+if(!r.matches(':hover'))r.style.background='';
+}
 };
 sd.appendChild(r);
 });
 body.appendChild(sd);
 });
-wrap.appendChild(hdr);wrap.appendChild(body);
+
+wrap.appendChild(hdr);
+wrap.appendChild(body);
+
 hdr.onclick=function(){
-if(body.style.display==='none'){body.style.display='';arr.textContent='\u25bc';}
+if(body.style.display==='none'){body.style.display='';arr.textContent='\u25bc';arr.style.transform='rotate(0deg)';}
 else{body.style.display='none';arr.textContent='\u25b6';}
 };
+
 sa.querySelector('.pt-sa').addEventListener('change',function(){
 var c=this.checked;
 body.querySelectorAll('[data-id]').forEach(function(r){
-var id=r.getAttribute('data-id');var ck=r.querySelector('.pt-ep-check');
-if(c){sel.add(id);ck.classList.add('selected');r.classList.add('pt-sel');}
-else{sel.delete(id);ck.classList.remove('selected');r.classList.remove('pt-sel');}
-});ucnt();
+var id=r.getAttribute('data-id');
+var ck=r.querySelector('div:first-child');
+if(c){sel.add(id);ck.style.background='#e50914';ck.style.borderColor='#e50914';ck.style.color='#fff';r.style.background='rgba(229,9,20,.12)';}
+else{sel.delete(id);ck.style.background='';ck.style.borderColor='rgba(255,255,255,.2)';ck.style.color='transparent';r.style.background='';}
 });
+ucnt();
+});
+
 return wrap;
 }
 
 function render(data){
 try{
-var c=document.getElementById('LibraryContent');c.innerHTML='';
+var c=document.getElementById('LibraryContent');
+c.innerHTML='';
 if(!data){throw new Error('Boş yanit alindi');}
-var mv=data.Movies||[];var sr=data.Series||[];
-if(!Array.isArray(mv))mv=[];if(!Array.isArray(sr))sr=[];
+var mv=data.Movies||[];
+var sr=data.Series||[];
+if(!Array.isArray(mv)) mv=[];
+if(!Array.isArray(sr)) sr=[];
 var te=0;sr.forEach(function(s){(s.Seasons||[]).forEach(function(sn){te+=sn.Episodes.length;});});
+
 if(!mv.length&&!te){
-c.innerHTML='<div class="pt-empty"><div class="pt-empty-icon">&#10004;</div><h3>Tebrikler!</h3><p style="color:#666;">Uyumsuz dosya yok.</p></div>';
+c.innerHTML='<div style="text-align:center;padding:3em;color:#666;"><div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">\u2714</div><h3 style="color:#999;">Tebrikler!</h3><p style="color:#666;">Uyumsuz dosya yok.</p></div>';
 return;
 }
+
 if(mv.length){
-var st=document.createElement('div');st.className='pt-section-title';
-st.innerHTML='Filmler <span class="pt-section-count">'+mv.length+'</span>';
+var st=document.createElement('div');
+st.style.cssText='font-size:.9em;font-weight:600;color:#aaa;margin-bottom:.75em;display:flex;align-items:center;gap:.5em;';
+st.innerHTML='Filmler <span style="font-size:.85em;padding:.1em .4em;border-radius:8px;background:rgba(255,255,255,.08);color:#999;font-weight:400;">'+mv.length+'</span>';
 c.appendChild(st);
-var grid=document.createElement('div');grid.style.cssText='display:flex;flex-wrap:wrap;';
+
+var grid=document.createElement('div');
+grid.style.cssText='display:flex;flex-wrap:wrap;';
 mv.forEach(function(item){grid.appendChild(mkMovie(item));});
 c.appendChild(grid);
 }
+
 if(sr.length){
-var st2=document.createElement('div');st2.className='pt-section-title';
-st2.innerHTML='Diziler <span class="pt-section-count">'+sr.length+' dizi, '+te+' bolum</span>';
+var st2=document.createElement('div');
+st2.style.cssText='font-size:.9em;font-weight:600;color:#aaa;margin:1.5em 0 .75em;display:flex;align-items:center;gap:.5em;';
+st2.innerHTML='Diziler <span style="font-size:.85em;padding:.1em .4em;border-radius:8px;background:rgba(255,255,255,.08);color:#999;font-weight:400;">'+sr.length+' dizi, '+te+' bolum</span>';
 c.appendChild(st2);
 sr.forEach(function(s){c.appendChild(mkSeries(s));});
 }
 }catch(e){
 console.error('PreTranscode render hatasi:',e);
 var c=document.getElementById('LibraryContent');
-c.innerHTML='<div class="pt-error"><p>Render hatasi: '+esc(String(e))+'</p></div>';
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><p>Render hatasi: '+esc(String(e))+'</p></div>';
 }
 }
 
 function loadItems(){
-Dashboard.showLoadingMsg();sel.clear();ucnt();
+Dashboard.showLoadingMsg();
+sel.clear();
 ApiClient.ajax({type:'GET',url:ApiClient.getUrl('Plugins/PreTranscode/Items')})
-.then(function(r){if(!r.ok)throw new Error('API hata: '+r.status);return r.json();})
-.then(function(d){render(d);Dashboard.hideLoadingMsg();})
+.then(function(r){
+if(!r.ok) throw new Error('API hata: '+r.status+' '+r.statusText);
+return r.json();
+})
+.then(function(d){
+try{render(d);}catch(e){console.error('PreTranscode render hatasi:',e);throw e;}
+Dashboard.hideLoadingMsg();
+})
 .catch(function(e){
-console.error('PreTranscode yukleme hatasi:',e);Dashboard.hideLoadingMsg();
+console.error('PreTranscode yukleme hatasi:',e);
+Dashboard.hideLoadingMsg();
 var c=document.getElementById('LibraryContent');
-c.innerHTML='<div class="pt-error"><div style="font-size:1.5em;margin-bottom:.5em;">&#9888;</div><p>Yuklenemedi: '+esc(String(e))+'</p></div>';
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><div style="font-size:1.5em;margin-bottom:.5em;">&#9888;</div><p>Yuklenemedi: '+esc(String(e))+'</p><p style="font-size:.85em;color:#888;margin-top:.5em;">Yenile butonuna basin veya sayfayi yenileyin.</p></div>';
 });
 }
 
@@ -563,8 +504,17 @@ v.querySelector('#MinimumFileSizeMb').value=cfg.MinimumFileSizeMb||100;
 v.querySelector('#MaxConcurrentJobs').value=cfg.MaxConcurrentJobs||1;
 v.querySelector('#SkipIfAlreadyTargetCodec').checked=cfg.SkipIfAlreadyTargetCodec;
 v.querySelector('#ReplaceOriginal').checked=cfg.ReplaceOriginal;
-document.getElementById('RenderDeviceField').style.display=(cfg.HardwareAcceleration==='Vaapi'||cfg.HardwareAcceleration==='Qsv')?'':'none';
-}).catch(function(e){console.error('PreTranscode: config yuklenemedi',e);});
+var hw=cfg.HardwareAcceleration;
+document.getElementById('RenderDeviceField').style.display=(hw==='Vaapi'||hw==='Qsv')?'':'none';
+}).catch(function(e){
+console.error('PreTranscode: config yuklenemedi',e);
+// Default degerlerle doldur
+var v=document.getElementById('PreTranscodeListPage');
+v.querySelector('#Quality').value=24;
+v.querySelector('#MaxWidth').value=0;
+v.querySelector('#MinimumFileSizeMb').value=100;
+v.querySelector('#MaxConcurrentJobs').value=1;
+});
 }
 
 document.getElementById('HardwareAcceleration').addEventListener('change',function(){
@@ -595,28 +545,29 @@ return false;
 });
 
 document.getElementById('PreTranscodeListPage').addEventListener('pageshow',function(){
-loadItems();
+showTab('l');loadItems();
 document.getElementById('RefreshBtn').onclick=loadItems;
 document.getElementById('SelectAllBtn').onclick=function(){
 document.querySelectorAll('[data-id]').forEach(function(el){
 var id=el.getAttribute('data-id');if(!id)return;
-sel.add(id);el.classList.add('pt-sel');
-var ck=el.querySelector('.pt-check,.pt-ep-check');
-if(ck)ck.classList.add('selected');
+sel.add(id);el.style.background='rgba(229,9,20,.12)';
+var ck=el.querySelector('div:first-child')||el.querySelector('.cardBox>div:last-child');
+if(ck){ck.style.background='#e50914';ck.style.borderColor='#e50914';ck.style.color='#fff';}
 });ucnt();};
 document.getElementById('DeselectAllBtn').onclick=function(){
 sel.clear();
-document.querySelectorAll('[data-id]').forEach(function(el){el.classList.remove('pt-sel');
-var ck=el.querySelector('.pt-check,.pt-ep-check');if(ck)ck.classList.remove('selected');});
+document.querySelectorAll('[data-id]').forEach(function(el){el.style.background='';
+var ck=el.querySelector('div:first-child');if(ck){ck.style.background='';ck.style.borderColor='rgba(255,255,255,.2)';ck.style.color='transparent';}});
 ucnt();};
 document.getElementById('EncodeBtn').onclick=function(){
 var ids=Array.from(sel);
 if(!ids.length){Dashboard.alert('En az bir ogre sec.');return;}
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Encode'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
 .then(function(){
-Dashboard.alert(ids.length+' ogre kuyruga alindi.');
+Dashboard.alert(ids.length+' ogre kuyruga alindi. Isler tabinda takip edebilirsiniz.');
 if(!jobInterval){jobInterval=setInterval(pollJobs,2000);}
 pollJobs();
+showTab('j');
 });
 };
 });

@@ -28,44 +28,6 @@ public class JobInfo
     public double OutputSizeMb { get; set; }
     public string? OutputPath { get; set; }
     public bool IsCancelling { get; set; }
-    // U3: Enhanced job info
-    public string? EncoderType { get; set; }        // e.g. "h264_vaapi", "hevc_nvenc", "libx264"
-    public string? CodecConversion { get; set; }   // e.g. "HEVC → H.264"
-    public string? ResolutionConversion { get; set; } // e.g. "4K → 1080p" or null
-    public double EncodeSpeedFps { get; set; }     // estimated fps
-    public string? EtaText { get; set; }           // e.g. "12dk"
-    public DateTime StartedAt { get; set; }
-    public DateTime? CompletedAt { get; set; }
-    // Internal tracking for ETA calculation
-    private double _lastOutputSize = 0;
-    private DateTime _lastSizeCheck = DateTime.MinValue;
-    internal void UpdateSpeed(double currentSize, DateTime now)
-    {
-        if (_lastOutputSize > 0 && _lastSizeCheck != DateTime.MinValue)
-        {
-            var elapsed = (now - _lastSizeCheck).TotalSeconds;
-            if (elapsed > 0)
-            {
-                var bytesPerSec = (currentSize - _lastOutputSize) / elapsed;
-                EncodeSpeedFps = Math.Max(0, Math.Round(bytesPerSec / 1024.0 / 1024.0, 1)); // MB/s as proxy
-            }
-        }
-        _lastOutputSize = currentSize;
-        _lastSizeCheck = now;
-    }
-    internal string? CalculateEta(double sourceSizeBytes, double progressPercent)
-    {
-        if (_lastOutputSize <= 0 || _lastSizeCheck == DateTime.MinValue || progressPercent <= 0 || progressPercent >= 95)
-            return null;
-        var elapsed = (DateTime.UtcNow - StartedAt).TotalSeconds;
-        if (elapsed < 5) return "Hesaplanıyor..."; // need minimum data
-        var remaining = 100 - progressPercent;
-        var secondsPerPercent = elapsed / progressPercent;
-        var remainingSeconds = remaining * secondsPerPercent;
-        if (remainingSeconds < 60)
-            return $"{Math.Ceiling(remainingSeconds)}sn";
-        return $"{Math.Ceiling(remainingSeconds / 60)}dk";
-    }
 }
 
 /// <summary>
@@ -116,16 +78,13 @@ public class JobQueueService : IDisposable
 
         var outputPath = GetOutputPath(sourcePath, config);
         var sourceSize = new FileInfo(sourcePath).Length;
-        var encoderType = GetEncoderTypeName(config);
         var job = new JobInfo
         {
             ItemId = itemId,
             Name = name,
             Status = JobStatus.Queued,
             OutputPath = outputPath,
-            SourceSizeMb = Math.Round(sourceSize / 1024.0 / 1024.0, 1),
-            EncoderType = encoderType,
-            CodecConversion = config.TargetVideoCodec == "h264" ? "→ H.264" : "→ HEVC"
+            SourceSizeMb = Math.Round(sourceSize / 1024.0 / 1024.0, 1)
         };
         _jobs[itemId] = job;
 
@@ -148,7 +107,6 @@ public class JobQueueService : IDisposable
         await _semaphore.WaitAsync().ConfigureAwait(false);
         job.Status = JobStatus.Running;
         job.IsCancelling = false;
-        job.StartedAt = DateTime.UtcNow;
 
         // Encode iptal kontrolu + progress polling
         var encodeCts = new CancellationTokenSource();
@@ -164,11 +122,8 @@ public class JobQueueService : IDisposable
                     if (File.Exists(outputPath))
                     {
                         var outSize = new FileInfo(outputPath).Length;
-                        var now = DateTime.UtcNow;
-                        job.UpdateSpeed(outSize, now);
                         job.OutputSizeMb = Math.Round(outSize / 1024.0 / 1024.0, 1);
                         job.ProgressPercent = Math.Min(95, Math.Round((outSize / (double)sourceSize) * 100, 1));
-                        job.EtaText = job.CalculateEta(sourceSize, job.ProgressPercent);
                     }
                 }
                 catch { }
@@ -189,23 +144,17 @@ public class JobQueueService : IDisposable
                 // Iptal edildi - partial dosyayi sil
                 job.Status = JobStatus.Cancelled;
                 job.Error = "Kullanici tarafindan iptal edildi.";
-                job.CompletedAt = DateTime.UtcNow;
-                job.EtaText = null;
                 CleanupPartial(outputPath);
             }
             else if (success)
             {
                 job.Status = JobStatus.Completed;
                 job.ProgressPercent = 100;
-                job.CompletedAt = DateTime.UtcNow;
-                job.EtaText = null;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
             }
             else
             {
                 job.Status = JobStatus.Failed;
-                job.CompletedAt = DateTime.UtcNow;
-                job.EtaText = null;
                 job.Error = "ffmpeg başarısız oldu, sunucu loglarına bakın.";
             }
         }
@@ -213,16 +162,12 @@ public class JobQueueService : IDisposable
         {
             job.Status = JobStatus.Cancelled;
             job.Error = "Kullanici tarafindan iptal edildi.";
-            job.CompletedAt = DateTime.UtcNow;
-            job.EtaText = null;
             CleanupPartial(outputPath);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "PreTranscode: iş hatası {Name}", job.Name);
             job.Status = JobStatus.Failed;
-            job.CompletedAt = DateTime.UtcNow;
-            job.EtaText = null;
             job.Error = ex.Message;
         }
         finally
@@ -259,18 +204,5 @@ public class JobQueueService : IDisposable
 
         var nameNoExt = Path.GetFileNameWithoutExtension(sourcePath);
         return Path.Combine(directory, $"{nameNoExt}-optimized.mkv");
-    }
-
-    private static string GetEncoderTypeName(PluginConfiguration config)
-    {
-        var codec = config.TargetVideoCodec == "h264" ? "h264" : "hevc";
-        return config.HardwareAcceleration switch
-        {
-            HwAccelType.Vaapi => $"{codec}_vaapi",
-            HwAccelType.Qsv => $"{codec}_qsv",
-            HwAccelType.Nvenc => $"{codec}_nvenc",
-            HwAccelType.Amf => $"{codec}_amf",
-            _ => codec == "h264" ? "libx264" : "libx265"
-        };
     }
 }
