@@ -162,7 +162,6 @@ p.innerHTML=html;
 var hasActive=jobs.some(function(j){return j.Status==='Running'||j.Status==='Queued';});
 if(!hasActive&&jobInterval){clearInterval(jobInterval);jobInterval=null;setTimeout(function(){document.getElementById('JobPanel').style.display='none';},5000);}
 if(hasActive){setTimeout(function(){var p2=document.getElementById('JobPanel');var oldJobs=p2.querySelectorAll('[data-status="Completed"],[data-status="Failed"],[data-status="Cancelled"]');oldJobs.forEach(function(el){el.remove();});},10000);}
-}
 // Bind cancel buttons
 p.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
 btn.onclick=function(){
@@ -171,6 +170,7 @@ if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+jobId)});
 };
 });
+}
 
 // Tabs
 function showTab(t){

@@ -8,12 +8,12 @@
     "category": "Library",
     "versions": [
       {
-        "version": "1.0.0.9",
+        "version": "1.0.0.10",
         "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.9/PreTranscode_1.0.0.9.zip",
-        "checksum": "BAE7C9884074D5E600C6DBA3C2EB66C1",
-        "changelog": "Fix broken UI - missing closing brace in renderJobs() caused fatal JS parse error",
-        "timestamp": "2026-08-01T16:35:00Z"
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.10/PreTranscode_1.0.0.10.zip",
+        "checksum": "CE390763F6D214E4DDE367116D124DD5",
+        "changelog": "Fix JS scope error - cancel button binding outside renderJobs() caused 'p is not defined' error, page wouldn't load",
+        "timestamp": "2026-08-01T18:00:00Z"
       },
       {
         "version": "1.0.0.8",
@@ -46,14 +46,6 @@
         "checksum": "76DCEDD160BA983524E8B8860129466A",
         "changelog": "Fix ffprobe path on Linux, VAAPI software fallback for unsupported codecs, HDR tonemap for software encoding",
         "timestamp": "2025-08-01T03:45:00Z"
-      },
-      {
-        "version": "1.0.0.4",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.4/PreTranscode_1.0.0.4.zip",
-        "checksum": "C81A1B88DFF82FB5195051ABBEF134BF",
-        "changelog": "Fix CUDA/NVENC encoding: add hwdownload+format=nv12 filter chain",
-        "timestamp": "2025-08-01T03:30:00Z"
       }
     ]
   }
