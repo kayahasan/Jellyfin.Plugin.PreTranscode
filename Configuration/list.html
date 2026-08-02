@@ -695,65 +695,7 @@ ucnt();};
 document.getElementById('EncodeBtn').onclick=function(){
 var ids=Array.from(sel);
 if(!ids.length){Dashboard.alert('En az bir dosya sec.');return;}
-showEncodePreview(ids);
-};
-
-function showEncodePreview(ids){
-Dashboard.showLoadingMsg();
-ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/EncodePreview'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
-.then(function(r){
-Dashboard.hideLoadingMsg();
-var totalSizeMb=r.TotalSizeMb||0;
-var totalSizeGb=(totalSizeMb/1024).toFixed(1);
-var estSavedGb=(totalSizeGb*0.4).toFixed(1); // Yaklasik %40 tasarruf
-var html='<div style="padding:1em;">';
-html+='<h3 style="margin-top:0;color:#e50914;">&#128230; Kodlama Onizlemesi</h3>';
-html+='<p style="color:#ccc;">Toplam: <b>'+r.TotalItems+'</b> dosya (<b>'+totalSizeGb+' GB</b>)</p>';
-html+='<p style="color:#30d158;">Kodlanacak: <b>'+r.ToEncode+'</b> dosya</p>';
-if(r.AlreadyTargetCodec>0){
-html+='<p style="color:#ffa500;">Atlanacak: <b>'+r.AlreadyTargetCodec+'</b> dosya (zaten hedef codec\'te)</p>';
-if(r.SkippedItems&&r.SkippedItems.length>0){
-html+='<div style="background:#1a1a1a;padding:.5em;border-radius:4px;margin:.5em 0;font-size:.85em;color:#aaa;max-height:100px;overflow-y:auto;">';
-r.SkippedItems.slice(0,5).forEach(function(s){html+='<div>• '+s+'</div>';});
-if(r.SkippedItems.length>5) html+='<div style="color:#666;">...ve '+ (r.SkippedItems.length-5) +' tane daha</div>';
-html+='</div>';
-}
-}
-html+='<p style="color:#888;font-size:.85em;">Tahmini tasarruf: ~'+estSavedGb+' GB</p>';
-html+='<div style="margin-top:1em;display:flex;gap:.5em;justify-content:flex-end;">';
-html+='<button id="PreviewCancel" is="emby-button" class="button-flat">Iptal</button>';
-html+='<button id="PreviewConfirm" is="emby-button" class="raised button-submit">Kodlamaya Basla</button>';
-html+='</div></div>';
-
-var dlg = {
-    title: '',
-    html: html,
-    scrollY: false
-};
-
-require(['dialog'], function (Dialog) {
-    var dialogInstance = new Dialog(dlg);
-    dialogInstance.on('open', function() {
-        $(dialogInstance.getModal()).css('maxWidth', '550px');
-        $(dialogInstance.getModal()).find('#PreviewCancel').off('click').on('click', function() {
-            dialogInstance.close();
-        });
-        $(dialogInstance.getModal()).find('#PreviewConfirm').off('click').on('click', function() {
-            dialogInstance.close();
-            encodeItems(ids);
-        });
-    });
-    dialogInstance.open();
-});
-})
-.catch(function(e){
-Dashboard.hideLoadingMsg();
-console.error('Preview hatasi:',e);
-Dashboard.alert('Onizleme alinamadi: '+e);
-});
-}
-
-function encodeItems(ids){
+if(!confirm(ids.length+' dosya kuyruga alinsin mi?')) return;
 Dashboard.showLoadingMsg();
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Encode'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
 .then(function(r){
@@ -772,7 +714,7 @@ Dashboard.hideLoadingMsg();
 console.error('Encode hatasi:',e);
 Dashboard.alert('Kodlama baslatilamadi: '+e);
 });
-}
+};
 
 // Bulk operations
 document.getElementById('BulkHevcToH264').onclick=function(){
