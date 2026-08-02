@@ -8,19 +8,35 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.11",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.11/PreTranscode_1.0.0.11.zip",
+        "checksum": "9D1EAD73E678FA2F51A70A933B0BF017",
+        "changelog": "Fix renderJobs scope error (cancel binding outside function), episode sort crash, and robust error handling - page now loads correctly",
+        "timestamp": "2026-08-02T12:30:00Z"
+      },
+      {
         "version": "1.0.0.10",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.10/PreTranscode_1.0.0.10.zip",
         "checksum": "F4F4D49DC9DAF6798433B3F3106064C4",
-        "changelog": "Fix JS scope error - cancel button binding outside renderJobs() caused 'p is not defined' error, page wouldn't load",
+        "changelog": "Fix episode sort crash and render error handling",
         "timestamp": "2026-08-01T18:00:00Z"
+      },
+      {
+        "version": "1.0.0.9",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.9/PreTranscode_1.0.0.9.zip",
+        "checksum": "BAE7C9884074D5E600C6DBA3C2EB66C1",
+        "changelog": "Fix broken UI - missing closing brace in renderJobs() caused fatal JS parse error",
+        "timestamp": "2026-08-01T16:35:00Z"
       },
       {
         "version": "1.0.0.8",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.8/PreTranscode_1.0.0.8.zip",
         "checksum": "0504CB62D8282C9C56506F337F518173",
-        "changelog": "Fix VAAPI h264 encoding - removed incorrect software fallback, h264_vaapi works with 10-bit format conversion",
+        "changelog": "Fix VAAPI h264 encoding - removed incorrect software fallback",
         "timestamp": "2025-08-01T04:30:00Z"
       },
       {
@@ -28,24 +44,8 @@
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.7/PreTranscode_1.0.0.7.zip",
         "checksum": "470FC75FA25934DCDA48C2FE7E8661E2",
-        "changelog": "Encode cancel button, AMF software fallback (Linux LXC), manifest max 5 versions, HDR tonemap improvements",
+        "changelog": "Encode cancel button, AMF software fallback, manifest max 5 versions",
         "timestamp": "2025-08-01T04:15:00Z"
-      },
-      {
-        "version": "1.0.0.6",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.6/PreTranscode_1.0.0.6.zip",
-        "checksum": "C949B8BE984FFAC1C87250ED6FB568CE",
-        "changelog": "Add AMD AMF encoder support (h264_amf, hevc_amf) - fast HW encoding for Radeon GPUs",
-        "timestamp": "2025-08-01T04:00:00Z"
-      },
-      {
-        "version": "1.0.0.5",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.5/PreTranscode_1.0.0.5.zip",
-        "checksum": "76DCEDD160BA983524E8B8860129466A",
-        "changelog": "Fix ffprobe path on Linux, VAAPI software fallback for unsupported codecs, HDR tonemap for software encoding",
-        "timestamp": "2025-08-01T03:45:00Z"
       }
     ]
   }
