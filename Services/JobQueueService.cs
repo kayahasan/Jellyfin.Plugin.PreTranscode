@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.PreTranscode.Configuration;
+using MediaBrowser.Model.Activity;
+using MediaBrowser.Controller.Activity;
 using Microsoft.Extensions.Logging;
 
 // Import HwAccelType from Configuration namespace
@@ -46,15 +48,17 @@ public class JobQueueService : IDisposable
 {
     private readonly ILogger<JobQueueService> _logger;
     private readonly EncoderService _encoderService;
+    private readonly IActivityManager _activityManager;
     private readonly ConcurrentDictionary<Guid, JobInfo> _jobs = new();
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private int _currentLimit = 1;
     private bool _disposed = false;
 
-    public JobQueueService(ILogger<JobQueueService> logger, EncoderService encoderService)
+    public JobQueueService(ILogger<JobQueueService> logger, EncoderService encoderService, IActivityManager activityManager)
     {
         _logger = logger;
         _encoderService = encoderService;
+        _activityManager = activityManager;
     }
 
     public void Dispose()
@@ -104,6 +108,25 @@ public class JobQueueService : IDisposable
         _jobs[itemId] = job;
 
         _ = RunJobAsync(job, sourcePath, outputPath, sourceSize, config);
+    }
+
+    private void LogActivity(string type, string itemName, string? details = null)
+    {
+        try
+        {
+            _activityManager.Create(new ActivityLog
+            {
+                Name = itemName,
+                Type = type,
+                ShortOverview = details,
+                // Use a custom category for PreTranscode
+                Category = "PreTranscode"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning("PreTranscode: Activity log kaydedilemedi: {Error}", ex.Message);
+        }
     }
 
     private void EnsureConcurrencyLimit(int limit)
@@ -186,6 +209,7 @@ public class JobQueueService : IDisposable
                 job.Status = JobStatus.Cancelled;
                 job.Error = "Kullanici tarafindan iptal edildi.";
                 CleanupPartial(outputPath);
+                LogActivity("PreTranscode Encode Cancelled", job.Name, "User cancelled the job");
             }
             else if (success)
             {
@@ -193,11 +217,14 @@ public class JobQueueService : IDisposable
                 job.ProgressPercent = 100;
                 job.CompletedAt = DateTime.UtcNow;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
+                var saved = job.SourceSizeMb - job.OutputSizeMb;
+                LogActivity("PreTranscode Encode Completed", job.Name, $"Saved {saved:F1} MB ({job.OutputSizeMb:F1} MB)");
             }
             else
             {
                 job.Status = JobStatus.Failed;
                 job.Error = "ffmpeg başarısız oldu, sunucu loglarına bakın.";
+                LogActivity("PreTranscode Encode Failed", job.Name, job.Error);
             }
         }
         catch (OperationCanceledException)
@@ -205,12 +232,14 @@ public class JobQueueService : IDisposable
             job.Status = JobStatus.Cancelled;
             job.Error = "Kullanici tarafindan iptal edildi.";
             CleanupPartial(outputPath);
+            LogActivity("PreTranscode Encode Cancelled", job.Name, "User cancelled the job");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "PreTranscode: iş hatası {Name}", job.Name);
             job.Status = JobStatus.Failed;
             job.Error = ex.Message;
+            LogActivity("PreTranscode Encode Failed", job.Name, job.Error);
         }
         finally
         {
