@@ -11,7 +11,7 @@
         "version": "1.0.0.11",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.11/PreTranscode_1.0.0.11.zip",
-        "checksum": "9D1EAD73E678FA2F51A70A933B0BF017",
+        "checksum": "3E9386BB9E2277A8B3BBD796579E9B3D",
         "changelog": "Fix renderJobs scope error (cancel binding outside function), episode sort crash, and robust error handling - page now loads correctly",
         "timestamp": "2026-08-02T12:30:00Z"
       },
