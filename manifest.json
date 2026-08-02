@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.23",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.23/PreTranscode_1.0.0.23.zip",
+        "checksum": "1D2BE25AA019E7DD1479251FCC254F8F",
+        "changelog": "Bulk selection visual feedback - selected items now show check icon and highlight background",
+        "timestamp": "2026-08-02T23:00:00Z"
+      },
+      {
         "version": "1.0.0.22",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.22/PreTranscode_1.0.0.22.zip",
@@ -38,70 +46,6 @@
         "checksum": "95C03AC2D45D0F93EED8C32A77C9C77F",
         "changelog": "Bulk operations (HEVC→H.264, 4K→1080p, 5GB+), encode preview dialog, show all files (filter in UI), auto-skip target codec at encode time",
         "timestamp": "2026-08-02T19:00:00Z"
-      },
-      {
-        "version": "1.0.0.18",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.18/PreTranscode_1.0.0.18.zip",
-        "checksum": "A45E6CFD5168FE0F7A205AE7DCF89B66",
-        "changelog": "Filters (codec/resolution/size) and sorting (size/name) for library view, resolution info on cards",
-        "timestamp": "2026-08-02T18:00:00Z"
-      },
-      {
-        "version": "1.0.0.17",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.17/PreTranscode_1.0.0.17.zip",
-        "checksum": "B72E3987B8854C3EC84903B945F914BB",
-        "changelog": "Enhanced JobInfo with encoder type badge (GPU/CPU), cancel fix (properly kills ffmpeg process)",
-        "timestamp": "2026-08-02T17:00:00Z"
-      },
-      {
-        "version": "1.0.0.16",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.16/PreTranscode_1.0.0.16.zip",
-        "checksum": "0DF0E2DDF5F57E5112E6DE9F26BBE579",
-        "changelog": "New Jobs tab with summary - dedicated job monitoring with stats (total, active, completed, saved space)",
-        "timestamp": "2026-08-02T14:00:00Z"
-      },
-      {
-        "version": "1.0.0.15",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.15/PreTranscode_1.0.0.15.zip",
-        "checksum": "DCC266238E56CDB2BFF57D279FF407FC",
-        "changelog": "Fix VAAPI h264 encoding on AMD GPUs - use hwdownload+format=nv12+hwupload for 10-bit to 8-bit conversion",
-        "timestamp": "2026-08-02T13:28:00Z"
-      },
-      {
-        "version": "1.0.0.14",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.14/PreTranscode_1.0.0.14.zip",
-        "checksum": "BC38E37B628B6F4762D686571F44D9C6",
-        "changelog": "Fix VAAPI h264 encoding on AMD GPUs - add profile:v main parameter",
-        "timestamp": "2026-08-02T13:15:00Z"
-      },
-      {
-        "version": "1.0.0.13",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.13/PreTranscode_1.0.0.13.zip",
-        "checksum": "25B33E5ECB5348105549581894A8D487",
-        "changelog": "Fix cancel button endpoint, fix VAAPI h264 with 10-bit sources (use nv12|vaapi format filter)",
-        "timestamp": "2026-08-02T13:00:00Z"
-      },
-      {
-        "version": "1.0.0.12",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.12/PreTranscode_1.0.0.12.zip",
-        "checksum": "22803EF100294587ECDC4533A3083125",
-        "changelog": "Fix cancel button endpoint - use FromRoute instead of FromBody",
-        "timestamp": "2026-08-02T12:50:00Z"
-      },
-      {
-        "version": "1.0.0.11",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.11/PreTranscode_1.0.0.11.zip",
-        "checksum": "3E9386BB9E2277A8B3BBD796579E9B3D",
-        "changelog": "Fix renderJobs scope error, episode sort crash, robust error handling - page loads correctly",
-        "timestamp": "2026-08-02T12:30:00Z"
       }
     ]
   }
