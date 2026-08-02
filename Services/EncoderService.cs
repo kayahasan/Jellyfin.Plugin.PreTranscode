@@ -448,23 +448,18 @@ public class EncoderService
 
     private string BuildVideoCodecArgs(PluginConfiguration config)
     {
-        var codecSuffix = config.HardwareAcceleration switch
-        {
-            HwAccelType.Vaapi => "_vaapi",
-            HwAccelType.Qsv => "_qsv",
-            HwAccelType.Nvenc => "_nvenc",
-            HwAccelType.Amf => "_amf",
-            _ => string.Empty
-        };
-
         var baseCodec = config.TargetVideoCodec == "h264" ? "h264" : "hevc";
-        var encoder = baseCodec + codecSuffix;
 
         return config.HardwareAcceleration switch
         {
             HwAccelType.None => $"-c:v lib{(baseCodec == "hevc" ? "x265" : "x264")} -preset medium -crf {config.Quality}",
-            HwAccelType.Amf => $"-c:v {encoder} -rc_mode vq -qp {config.Quality}",
-            _ => $"-c:v {encoder} -qp {config.Quality}"
+            HwAccelType.Vaapi => baseCodec == "h264"
+                ? $"-c:v h264_vaapi -profile:v main -qp {config.Quality}"
+                : $"-c:v hevc_vaapi -qp {config.Quality}",
+            HwAccelType.Qsv => $"-c:v {baseCodec}_qsv -qp {config.Quality}",
+            HwAccelType.Nvenc => $"-c:v {baseCodec}_nvenc -cq {config.Quality}",
+            HwAccelType.Amf => $"-c:v {baseCodec}_amf -rc_mode vq -qp {config.Quality}",
+            _ => $"-c:v lib{(baseCodec == "hevc" ? "x265" : "x264")} -preset medium -crf {config.Quality}"
         };
     }
 
