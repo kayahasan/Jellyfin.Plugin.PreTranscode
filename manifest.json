@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.19",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.19/PreTranscode_1.0.0.19.zip",
+        "checksum": "95C03AC2D45D0F93EED8C32A77C9C77F",
+        "changelog": "Bulk operations (HEVC→H.264, 4K→1080p, 5GB+), encode preview dialog, show all files (filter in UI), auto-skip target codec at encode time",
+        "timestamp": "2026-08-02T19:00:00Z"
+      },
+      {
         "version": "1.0.0.18",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.18/PreTranscode_1.0.0.18.zip",
