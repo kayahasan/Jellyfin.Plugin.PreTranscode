@@ -46,8 +46,7 @@
         "checksum": "25B33E5ECB5348105549581894A8D487",
         "changelog": "Fix cancel button endpoint, fix VAAPI h264 with 10-bit sources (use nv12|vaapi format filter)",
         "timestamp": "2026-08-02T13:00:00Z"
-      },
-
+      }
     ]
   }
 ]
