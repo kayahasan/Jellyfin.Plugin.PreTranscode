@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.22",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.22/PreTranscode_1.0.0.22.zip",
+        "checksum": "CBEA9BBA58BB45846109AD7763FE207B",
+        "changelog": "Fixed encode preview dialog, simplified to confirm dialog, includes Activity Log integration",
+        "timestamp": "2026-08-02T22:00:00Z"
+      },
+      {
         "version": "1.0.0.21",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.21/PreTranscode_1.0.0.21.zip",
