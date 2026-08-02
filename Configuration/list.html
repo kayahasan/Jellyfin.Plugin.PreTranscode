@@ -373,9 +373,14 @@ return wrap;
 }
 
 function render(data){
+try{
 var c=document.getElementById('LibraryContent');
 c.innerHTML='';
-var mv=data.Movies||[],sr=data.Series||[];
+if(!data){throw new Error('Boş yanit alindi');}
+var mv=data.Movies||[];
+var sr=data.Series||[];
+if(!Array.isArray(mv)) mv=[];
+if(!Array.isArray(sr)) sr=[];
 var te=0;sr.forEach(function(s){(s.Seasons||[]).forEach(function(sn){te+=sn.Episodes.length;});});
 
 if(!mv.length&&!te){
@@ -402,15 +407,31 @@ st2.innerHTML='Diziler <span style="font-size:.85em;padding:.1em .4em;border-rad
 c.appendChild(st2);
 sr.forEach(function(s){c.appendChild(mkSeries(s));});
 }
+}catch(e){
+console.error('PreTranscode render hatasi:',e);
+var c=document.getElementById('LibraryContent');
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><p>Render hatasi: '+esc(String(e))+'</p></div>';
+}
 }
 
 function loadItems(){
 Dashboard.showLoadingMsg();
 sel.clear();
 ApiClient.ajax({type:'GET',url:ApiClient.getUrl('Plugins/PreTranscode/Items')})
-.then(function(r){return r.json();})
-.then(function(d){render(d);Dashboard.hideLoadingMsg();})
-.catch(function(e){console.error(e);Dashboard.hideLoadingMsg();document.getElementById('LibraryContent').innerHTML='<p style="color:#ff6b6b;">Hata: '+esc(String(e))+'</p>';});
+.then(function(r){
+if(!r.ok) throw new Error('API hata: '+r.status+' '+r.statusText);
+return r.json();
+})
+.then(function(d){
+try{render(d);}catch(e){console.error('PreTranscode render hatasi:',e);throw e;}
+Dashboard.hideLoadingMsg();
+})
+.catch(function(e){
+console.error('PreTranscode yukleme hatasi:',e);
+Dashboard.hideLoadingMsg();
+var c=document.getElementById('LibraryContent');
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><div style="font-size:1.5em;margin-bottom:.5em;">&#9888;</div><p>Yuklenemedi: '+esc(String(e))+'</p><p style="font-size:.85em;color:#888;margin-top:.5em;">Yenile butonuna basin veya sayfayi yenileyin.</p></div>';
+});
 }
 
 function loadCfg(){

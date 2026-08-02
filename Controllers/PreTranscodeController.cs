@@ -162,9 +162,12 @@ public class PreTranscodeController : ControllerBase
                 season.Episodes.Sort((a, b) =>
 {
 // "1 - Episode Name" formatinda - ilk kismi numerik sirala
-var na = int.Parse(a.Name.Split('-')[0].Trim());
-var nb = int.Parse(b.Name.Split('-')[0].Trim());
+if (int.TryParse(a.Name.Split('-')[0].Trim(), out var na) &&
+    int.TryParse(b.Name.Split('-')[0].Trim(), out var nb))
+{
 return na.CompareTo(nb);
+}
+return string.Compare(a.Name, b.Name, StringComparison.Ordinal);
 });
             }
         }
