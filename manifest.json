@@ -8,6 +8,14 @@
     "category": "Library",
     "versions": [
       {
+        "version": "1.0.0.17",
+        "targetAbi": "10.11.11",
+        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.17/PreTranscode_1.0.0.17.zip",
+        "checksum": "B72E3987B8854C3EC84903B945F914BB",
+        "changelog": "Enhanced JobInfo with encoder type badge (GPU/CPU), cancel fix (properly kills ffmpeg process)",
+        "timestamp": "2026-08-02T17:00:00Z"
+      },
+      {
         "version": "1.0.0.16",
         "targetAbi": "10.11.11",
         "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.16/PreTranscode_1.0.0.16.zip",
