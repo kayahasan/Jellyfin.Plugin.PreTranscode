@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Jellyfin.Database.Implementations.Entities;
 using Jellyfin.Plugin.PreTranscode.Configuration;
 using MediaBrowser.Model.Activity;
-using MediaBrowser.Controller.Activity;
 using Microsoft.Extensions.Logging;
 
 // Import HwAccelType from Configuration namespace
@@ -110,25 +110,6 @@ public class JobQueueService : IDisposable
         _ = RunJobAsync(job, sourcePath, outputPath, sourceSize, config);
     }
 
-    private void LogActivity(string type, string itemName, string? details = null)
-    {
-        try
-        {
-            _activityManager.Create(new ActivityLog
-            {
-                Name = itemName,
-                Type = type,
-                ShortOverview = details,
-                // Use a custom category for PreTranscode
-                Category = "PreTranscode"
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning("PreTranscode: Activity log kaydedilemedi: {Error}", ex.Message);
-        }
-    }
-
     private void EnsureConcurrencyLimit(int limit)
     {
         limit = Math.Max(1, limit);
@@ -209,7 +190,6 @@ public class JobQueueService : IDisposable
                 job.Status = JobStatus.Cancelled;
                 job.Error = "Kullanici tarafindan iptal edildi.";
                 CleanupPartial(outputPath);
-                LogActivity("PreTranscode Encode Cancelled", job.Name, "User cancelled the job");
             }
             else if (success)
             {
@@ -217,14 +197,16 @@ public class JobQueueService : IDisposable
                 job.ProgressPercent = 100;
                 job.CompletedAt = DateTime.UtcNow;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
-                var saved = job.SourceSizeMb - job.OutputSizeMb;
-                LogActivity("PreTranscode Encode Completed", job.Name, $"Saved {saved:F1} MB ({job.OutputSizeMb:F1} MB)");
+                // Activity log - başarı
+                var savedMb = job.SourceSizeMb - job.OutputSizeMb;
+                var savedGb = Math.Round(savedMb / 1024.0, 1);
+                _ = LogActivityAsync(job.Name, "PreTranscode: Kodlama tamamlandı", $"{job.SourceSizeMb:F1} MB → {job.OutputSizeMb:F1} MB ({savedGb} GB tasarruf)");
             }
             else
             {
                 job.Status = JobStatus.Failed;
                 job.Error = "ffmpeg başarısız oldu, sunucu loglarına bakın.";
-                LogActivity("PreTranscode Encode Failed", job.Name, job.Error);
+                _ = LogActivityAsync(job.Name, "PreTranscode: Kodlama başarısız", "Sunucu loglarına bakın.");
             }
         }
         catch (OperationCanceledException)
@@ -232,14 +214,13 @@ public class JobQueueService : IDisposable
             job.Status = JobStatus.Cancelled;
             job.Error = "Kullanici tarafindan iptal edildi.";
             CleanupPartial(outputPath);
-            LogActivity("PreTranscode Encode Cancelled", job.Name, "User cancelled the job");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "PreTranscode: iş hatası {Name}", job.Name);
             job.Status = JobStatus.Failed;
             job.Error = ex.Message;
-            LogActivity("PreTranscode Encode Failed", job.Name, job.Error);
+            _ = LogActivityAsync(job.Name, "PreTranscode: Kodlama hatası", ex.Message);
         }
         finally
         {
@@ -275,5 +256,32 @@ public class JobQueueService : IDisposable
 
         var nameNoExt = Path.GetFileNameWithoutExtension(sourcePath);
         return Path.Combine(directory, $"{nameNoExt}-optimized.mkv");
+    }
+
+    private async Task LogActivityAsync(string itemName, string name, string overview)
+    {
+        try
+        {
+            // Get first admin user ID for system activities
+            var userId = GetSystemUserId();
+            var entry = new ActivityLog(name, "PreTranscode", userId)
+            {
+                Overview = overview,
+                ShortOverview = overview,
+                ItemId = itemName
+            };
+            await _activityManager.CreateAsync(entry).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "PreTranscode: Activity log yazılamadı");
+        }
+    }
+
+    private Guid GetSystemUserId()
+    {
+        // Use Guid.Empty as system user for plugin activities
+        // Jellyfin will show these as system activities
+        return Guid.Empty;
     }
 }
