@@ -7,70 +7,72 @@
 
 <div class="heroDescription" id="PtHero">
 <h2>PreTranscode</h2>
-<p>Uyumsuz dosyalar&#305; bulun, se&#305;in ve kodlay&#305;n</p>
+<p>Uyumsuz dosyaları bulun, seçin ve kodlayın</p>
 </div>
 
 <div id="PtTabs" class="flex align-items-center" style="gap:0;margin-bottom:1.5em;border-bottom:2px solid #333;">
 <button id="TabLibrary" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#e50914;font-weight:700;font-size:.95em;cursor:pointer;border-bottom:2px solid #e50914;margin-bottom:-2px;transition:all .2s;">
-&#127916; K&#252;t&#252;phane</button>
+🎬 Kütüphane</button>
 <button id="TabJobs" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#888;font-weight:400;font-size:.95em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;">
-&#128202; &#304;&#351;ler</button>
+📊 İşler</button>
 <button id="TabSettings" class="button-flat" style="flex:1;padding:.7em;border:none;background:transparent;color:#888;font-weight:400;font-size:.95em;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;">
-&#9881; Ayarlar</button>
+⚙ Ayarlar</button>
 </div>
 
 <div id="PanelLibrary">
+<!-- Sticky header -->
+<div id="PtStickyHeader" style="position:sticky;top:0;z-index:100;background:#1a1a1a;padding:.75em;border-radius:6px;margin-bottom:1em;border:1px solid #333;box-shadow:0 2px 8px rgba(0,0,0,.4);">
 <div style="display:flex;gap:.5em;margin-bottom:.75em;flex-wrap:wrap;align-items:center;">
-<button id="RefreshBtn" is="emby-button" type="button" class="button-flat"><span>&#8635; Yenile</span></button>
-<button id="SelectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#9745; T&#252;m&#252;n&#252; Se&#305;</span></button>
-<button id="DeselectAllBtn" is="emby-button" type="button" class="button-flat"><span>&#10008; Kald&#305;r</span></button>
+<button id="RefreshBtn" is="emby-button" type="button" class="button-flat"><span>↻ Yenile</span></button>
+<button id="SelectAllBtn" is="emby-button" type="button" class="button-flat"><span>☑ Tümünü Seç</span></button>
+<button id="DeselectAllBtn" is="emby-button" type="button" class="button-flat"><span>✘ Kaldır</span></button>
 <div style="flex:1;"></div>
 <span id="SelectedCount" style="color:#888;font-size:.85em;"></span>
-<button id="EncodeBtn" is="emby-button" type="button" class="raised button-submit block"><span>&#9654; Se&#305;ilenleri Kodla</span></button>
+<button id="EncodeBtn" is="emby-button" type="button" class="raised button-submit block"><span>▶ Seçilenleri Kodla</span></button>
 </div>
-<div style="background:#1a1a1a;border-radius:6px;padding:.75em;margin-bottom:1em;border:1px solid #333;">
 <div style="display:flex;gap:.5em;flex-wrap:wrap;align-items:center;">
-<span style="font-size:.85em;color:#aaa;font-weight:600;">&#128269; Filtrele:</span>
+<span style="font-size:.85em;color:#aaa;font-weight:600;">🔍 Filtrele:</span>
 <select id="FilterCodec" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:130px;">
-<option value="">T&#252;m Codec'ler</option>
+<option value="">Tüm Codec'ler</option>
 <option value="hevc">HEVC</option>
 <option value="h264">H.264</option>
 <option value="av1">AV1</option>
 <option value="vp9">VP9</option>
 </select>
 <select id="FilterRes" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:120px;">
-<option value="">T&#252;m &#305;z&#252;nl&#252;kler</option>
+<option value="">Tüm İzinlikler</option>
 <option value="4K">4K</option>
 <option value="1080p">1080p</option>
 <option value="720p">720p</option>
 </select>
 <select id="FilterSize" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:110px;">
-<option value="">T&#252;m Boyutlar</option>
+<option value="">Tüm Boyutlar</option>
 <option value="1024">1GB+</option>
 <option value="5120">5GB+</option>
 <option value="10240">10GB+</option>
 </select>
-<span style="font-size:.85em;color:#aaa;font-weight:600;margin-left:.5em;">&#128203; S&#305;rala:</span>
+<span style="font-size:.85em;color:#aaa;font-weight:600;margin-left:.5em;">📋 Sırala:</span>
 <select id="SortBy" style="background:#2a2a2a;border:1px solid #444;color:#ddd;padding:.4em .6em;border-radius:4px;font-size:.85em;min-width:180px;">
-<option value="size-desc">Boyut (b&#252;y&#252;k&#8594;k&#252;&#305;&#305;k)</option>
-<option value="size-asc">Boyut (k&#252;&#305;&#305;k&#8594;b&#252;y&#252;k)</option>
-<option value="name-asc">&#305;sim (A-Z)</option>
+<option value="size-desc">Boyut (büyük→küçük)</option>
+<option value="size-asc">Boyut (küçük→büyük)</option>
+<option value="name-asc">İsim (A-Z)</option>
 </select>
 <span id="FilterCount" style="font-size:.85em;color:#30d158;margin-left:.5em;font-weight:600;"></span>
 </div>
 <div style="display:flex;gap:.5em;margin-top:.6em;flex-wrap:wrap;align-items:center;">
-<span style="font-size:.85em;color:#aaa;font-weight:600;">&#128640; Toplu:</span>
-<button id="BulkHevcToH264" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);color:#e50914;border-radius:4px;"><span>&#128260; HEVC &#8594; H.264</span></button>
-<button id="Bulk4kTo1080p" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(48,209,88,.15);border:1px solid rgba(48,209,88,.3);color:#30d158;border-radius:4px;"><span>&#128260; 4K &#8594; 1080p</span></button>
-<button id="BulkLargeFiles" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(255,165,0,.15);border:1px solid rgba(255,165,0,.3);color:#ffa500;border-radius:4px;"><span>&#128260; 5GB+ Dosyalar</span></button>
+<span style="font-size:.85em;color:#aaa;font-weight:600;">🚀 Toplu:</span>
+<button id="BulkHevcToH264" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(229,9,20,.15);border:1px solid rgba(229,9,20,.3);color:#e50914;border-radius:4px;"><span>🔄 HEVC → H.264</span></button>
+<button id="Bulk4kTo1080p" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(48,209,88,.15);border:1px solid rgba(48,209,88,.3);color:#30d158;border-radius:4px;"><span>🔄 4K → 1080p</span></button>
+<button id="BulkLargeFiles" is="emby-button" type="button" class="button-flat" style="font-size:.85em;padding:.3em .6em;background:rgba(255,165,0,.15);border:1px solid rgba(255,165,0,.3);color:#ffa500;border-radius:4px;"><span>🔄 5GB+ Dosyalar</span></button>
 </div>
 </div>
+<!-- End sticky header -->
 <div id="LibraryContent"></div>
 </div>
 
 <div id="PanelJobs" style="display:none;">
 <div id="JobSummary" style="display:none;margin-bottom:1em;background:rgba(255,255,255,.03);border:1px solid #333;border-radius:8px;padding:.75em;">
-<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">&#128202; &#304;&#351; &#351;zeti</div>
+<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">📊 İş Özeti</div>
 <div style="display:flex;gap:1.5em;font-size:.85em;color:#ccc;">
 <span id="SummaryTotal"></span>
 <span id="SummaryCompleted"></span>
@@ -80,9 +82,9 @@
 </div>
 <div id="JobPanel" style="display:none;"></div>
 <div id="JobEmpty" style="text-align:center;padding:3em;color:#666;">
-<div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">&#9989;</div>
-<h3 style="color:#999;">Aktif i&#351; yok</h3>
-<p style="color:#666;">Kodlama i&#351;lemleri burada g&#246;recek.</p>
+<div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">✔</div>
+<h3 style="color:#999;">Aktif iş yok</h3>
+<p style="color:#666;">Kodlama işlemleri burada görünecek.</p>
 </div>
 </div>
 
@@ -91,8 +93,8 @@
 <div class="verticalSection">
 <h3>Encoder</h3>
 <div class="selectContainer">
-<select is="emby-select" id="HardwareAcceleration" label="Donan&#305;m H&#305;zland&#305;rma">
-<option value="None">Yok (yaz&#305;l&#305;m)</option>
+<select is="emby-select" id="HardwareAcceleration" label="Donanım Hızlandırma">
+<option value="None">Yok (yazılım)</option>
 <option value="Vaapi">VAAPI (Intel/AMD)</option>
 <option value="Qsv">Intel QSV</option>
 <option value="Nvenc">NVIDIA NVENC</option>
@@ -107,7 +109,7 @@
 </div>
 <div id="RenderDeviceField">
 <div class="inputContainer">
-<input is="emby-input" type="text" id="RenderDevicePath" label="Render Cihaz&#305; Yolu" />
+<input is="emby-input" type="text" id="RenderDevicePath" label="Render Cihazı Yolu" />
 </div>
 </div>
 </div>
@@ -118,7 +120,7 @@
 <input is="emby-input" type="number" id="Quality" label="Kalite (CRF/QP)" />
 </div>
 <div class="inputContainer">
-<input is="emby-input" type="number" id="MaxWidth" label="Maksimum Geni&#351;lik (0 = orijinal)" />
+<input is="emby-input" type="number" id="MaxWidth" label="Maksimum Genişlik (0 = orijinal)" />
 </div>
 </div>
 
@@ -128,16 +130,16 @@
 <input is="emby-input" type="number" id="MinimumFileSizeMb" label="Minimum Dosya Boyutu (MB)" />
 </div>
 <div class="inputContainer">
-<input is="emby-input" type="number" id="MaxConcurrentJobs" label="E&#351;zamanl&#305; &#304;&#351; Say&#305;s&#305;" />
+<input is="emby-input" type="number" id="MaxConcurrentJobs" label="Eşzamanlı İş Sayısı" />
 </div>
 </div>
 
 <div class="verticalSection">
-<h3>Se&#305;enekler</h3>
+<h3>Seçenekler</h3>
 <div class="checkboxContainer">
-<label><input is="emby-checkbox" type="checkbox" id="ReplaceOriginal" /><span style="color:#ff6b6b;">Orijinali de&#287;i&#351;tir (geri al&#305;namaz)</span></label>
+<label><input is="emby-checkbox" type="checkbox" id="ReplaceOriginal" /><span style="color:#ff6b6b;">Orijinali değiştir (geri alınamaz)</span></label>
 </div>
-<p style="font-size:.85em;color:#888;margin-top:.5em;">&#128270; Not: Kodlama sirasinda zaten hedef codec'teki dosyalar otomatik atlanir.</p>
+<p style="font-size:.85em;color:#888;margin-top:.5em;">⚠ Not: Kodlama sırasında zaten hedef codec'teki dosyalar otomatik atlanır.</p>
 </div>
 
 <div style="padding-top:1.5em;">
@@ -197,20 +199,20 @@ var savedPct=totalSrc>0?Math.round((1-totalOut/totalSrc)*100):0;
 
 // Update summary
 summary.style.display='';
-document.getElementById('SummaryTotal').textContent='&#128196; Toplam: '+total+' ('+running+' aktif, '+queued+' kuyrukta, '+completed+' tamamlandi'+(failed>0?', '+failed+' hata':'')+')';
-document.getElementById('SummaryCompleted').textContent='&#10004; Tamamlandi: '+completed;
-document.getElementById('SummaryRunning').textContent='&#9654; Aktif: '+running;
-document.getElementById('SummarySaved').textContent=totalOut>0?'&#128188; Tasarruf: '+fsize(totalSrc)+' &#8594; '+fsize(totalOut)+' ('+savedPct+'%)':'';
+document.getElementById('SummaryTotal').textContent='📦 Toplam: '+total+' ('+running+' aktif, '+queued+' kuyrukta, '+completed+' tamamlandı'+(failed>0?', '+failed+' hata':'')+')';
+document.getElementById('SummaryCompleted').textContent='✓ Tamamlandı: '+completed;
+document.getElementById('SummaryRunning').textContent='▶ Aktif: '+running;
+document.getElementById('SummarySaved').textContent=totalOut>0?'💾 Tasarruf: '+fsize(totalSrc)+' → '+fsize(totalOut)+' ('+savedPct+'%)':'';
 
 var html='<div style="background:rgba(255,255,255,.03);border:1px solid #333;border-radius:8px;padding:.75em;">';
-html+='<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">&#9881; Islem Durumu</div>';
+html+='<div style="font-size:.85em;font-weight:600;color:#aaa;margin-bottom:.5em;">⚙ İşlem Durumu</div>';
 jobs.forEach(function(j){
 var statusIcon,statusColor,statusText;
-if(j.Status==='Running'){statusIcon='&#9654;';statusColor='#30d158';statusText='Kodlaniyor...';}
-else if(j.Status==='Queued'){statusIcon='&#9203;';statusColor='#f5c542';statusText='Kuyrukta';}
-else if(j.Status==='Completed'){statusIcon='&#10004;';statusColor='#30d158';statusText='Tamamlandi';}
-else if(j.Status==='Cancelled'){statusIcon='&#9209;';statusColor='#f5c542';statusText=j.Error||'Iptal Edildi';}
-else{statusIcon='&#10006;';statusColor='#ff6b6b';statusText=j.Error||'Hata';}
+if(j.Status==='Running'){statusIcon='▶';statusColor='#30d158';statusText='Kodlanıyor...';}
+else if(j.Status==='Queued'){statusIcon='⏳';statusColor='#f5c542';statusText='Kuyrukta';}
+else if(j.Status==='Completed'){statusIcon='✓';statusColor='#30d158';statusText='Tamamlandı';}
+else if(j.Status==='Cancelled'){statusIcon='⏹';statusColor='#f5c542';statusText=j.Error||'İptal Edildi';}
+else{statusIcon='✕';statusColor='#ff6b6b';statusText=j.Error||'Hata';}
 
 var pct=Math.round(j.ProgressPercent||0);
 var outMb=j.OutputSizeMb||0;
@@ -221,7 +223,7 @@ var srcStr=srcMb>0?(srcMb>=1024?(srcMb/1024).toFixed(2)+'GB':Math.round(srcMb)+'
 // Cancel button
 var cancelBtn='';
 if(j.Status==='Running'){
-cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">Iptal</button>';
+cancelBtn='<button data-cancel-id="'+j.ItemId+'" class="pt-cancel-btn" style="background:rgba(255,107,107,.2);border:1px solid #ff6b6b;color:#ff6b6b;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:.75em;margin-left:.5em;">İptal</button>';
 }
 
 html+='<div style="display:flex;align-items:center;gap:.5em;padding:.5em 0;border-bottom:1px solid rgba(255,255,255,.04);">';
@@ -278,7 +280,7 @@ return Math.round(mb)+'MB';
 p.querySelectorAll('.pt-cancel-btn').forEach(function(btn){
 btn.onclick=function(){
 var jobId=this.getAttribute('data-cancel-id');
-if(!confirm('Bu islemi iptal etmek istediğinize emin misiniz?')) return;
+if(!confirm('Bu işlemi iptal etmek istediğinize emin misiniz?')) return;
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Cancel/'+jobId)});
 };
 });
@@ -321,7 +323,7 @@ document.getElementById('SortBy').onchange=function(){applyFiltersAndRender();};
 function esc(s){var d=document.createElement('span');d.textContent=s;return d.innerHTML;}
 function purl(id){return ApiClient.getUrl('Items/'+id+'/Images/Primary');}
 function fsize(mb){return mb>=1024?(mb/1024).toFixed(1)+' GB':Math.round(mb)+' MB';}
-function ucnt(){document.getElementById('SelectedCount').textContent=sel.size>0?sel.size+' secili':'';}
+function ucnt(){document.getElementById('SelectedCount').textContent=sel.size>0?sel.size+' seçili':'';}
 function tog(id,el){
 if(sel.has(id)){sel.delete(id);el.classList.remove('pt-sel');}
 else{sel.add(id);el.classList.add('pt-sel');}
@@ -417,7 +419,7 @@ var st=document.createElement('div');
 st.style.cssText='flex:1;';
 st.innerHTML='<div style="font-weight:600;font-size:.92em;">'+esc(si.Name)+'</div>';
 var epc=0;(si.Seasons||[]).forEach(function(s){epc+=s.Episodes.length;});
-st.innerHTML+='<div style="font-size:.78em;color:#888;">'+epc+' bolum</div>';
+st.innerHTML+='<div style="font-size:.78em;color:#888;">'+epc+' bölüm</div>';
 hdr.appendChild(st);
 
 var arr=document.createElement('span');
@@ -431,7 +433,7 @@ body.style.display='none';
 // Select all
 var sa=document.createElement('div');
 sa.style.cssText='padding:.4em .75em;border-bottom:1px solid #222;display:flex;align-items:center;gap:.4em;font-size:.82em;color:#999;';
-sa.innerHTML='<input type="checkbox" class="pt-sa" /> Tum bolimleri sec';
+sa.innerHTML='<input type="checkbox" class="pt-sa" /> Tüm bölümleri seç';
 body.appendChild(sa);
 
 (si.Seasons||[]).forEach(function(season){
@@ -524,7 +526,7 @@ function render(data){
 try{
 var c=document.getElementById('LibraryContent');
 c.innerHTML='';
-if(!data){throw new Error('Boş yanit alindi');}
+if(!data){throw new Error('Boş yanıt alındı');}
 var mv=data.Movies||[];
 var sr=data.Series||[];
 if(!Array.isArray(mv)) mv=[];
@@ -532,7 +534,7 @@ if(!Array.isArray(sr)) sr=[];
 var te=0;sr.forEach(function(s){(s.Seasons||[]).forEach(function(sn){te+=sn.Episodes.length;});});
 
 if(!mv.length&&!te){
-c.innerHTML='<div style="text-align:center;padding:3em;color:#666;"><div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">\u2714</div><h3 style="color:#999;">Tebrikler!</h3><p style="color:#666;">Uyumsuz dosya yok.</p></div>';
+c.innerHTML='<div style="text-align:center;padding:3em;color:#666;"><div style="font-size:2.5em;color:#30d158;margin-bottom:.5em;">✔</div><h3 style="color:#999;">Tebrikler!</h3><p style="color:#666;">Uyumsuz dosya yok.</p></div>';
 return;
 }
 
@@ -551,7 +553,7 @@ c.appendChild(grid);
 if(sr.length){
 var st2=document.createElement('div');
 st2.style.cssText='font-size:.9em;font-weight:600;color:#aaa;margin:1.5em 0 .75em;display:flex;align-items:center;gap:.5em;';
-st2.innerHTML='Diziler <span style="font-size:.85em;padding:.1em .4em;border-radius:8px;background:rgba(255,255,255,.08);color:#999;font-weight:400;">'+sr.length+' dizi, '+te+' bolum</span>';
+st2.innerHTML='Diziler <span style="font-size:.85em;padding:.1em .4em;border-radius:8px;background:rgba(255,255,255,.08);color:#999;font-weight:400;">'+sr.length+' dizi, '+te+' bölüm</span>';
 c.appendChild(st2);
 sr.forEach(function(s){c.appendChild(mkSeries(s));});
 }
@@ -559,9 +561,9 @@ sr.forEach(function(s){c.appendChild(mkSeries(s));});
 // Apply selection visuals after render
 applySelectionVisuals();
 }catch(e){
-console.error('PreTranscode render hatasi:',e);
+console.error('PreTranscode render hatası:',e);
 var c=document.getElementById('LibraryContent');
-c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><p>Render hatasi: '+esc(String(e))+'</p></div>';
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><p>Render hatası: '+esc(String(e))+'</p></div>';
 }
 }
 
@@ -575,14 +577,14 @@ return r.json();
 })
 .then(function(d){
 rawItems=d; // Store raw data
-try{applyFiltersAndRender();}catch(e){console.error('PreTranscode render hatasi:',e);throw e;}
+try{applyFiltersAndRender();}catch(e){console.error('PreTranscode render hatası:',e);throw e;}
 Dashboard.hideLoadingMsg();
 })
 .catch(function(e){
-console.error('PreTranscode yukleme hatasi:',e);
+console.error('PreTranscode yükleme hatası:',e);
 Dashboard.hideLoadingMsg();
 var c=document.getElementById('LibraryContent');
-c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><div style="font-size:1.5em;margin-bottom:.5em;">&#9888;</div><p>Yuklenemedi: '+esc(String(e))+'</p><p style="font-size:.85em;color:#888;margin-top:.5em;">Yenile butonuna basin veya sayfayi yenileyin.</p></div>';
+c.innerHTML='<div style="text-align:center;padding:2em;color:#ff6b6b;"><div style="font-size:1.5em;margin-bottom:.5em;">⚠</div><p>Yüklenemedi: '+esc(String(e))+'</p><p style="font-size:.85em;color:#888;margin-top:.5em;">Yenile butonuna basın veya sayfayı yenileyin.</p></div>';
 });
 }
 
@@ -639,7 +641,7 @@ var originalEpisodes=0;
 var originalTotal=originalMovies+originalEpisodes;
 var fc=document.getElementById('FilterCount');
 if(total<originalTotal){
-fc.textContent=total+'/'+originalTotal+' gosteriliyor';
+fc.textContent=total+'/'+originalTotal+' gösteriliyor';
 }else{
 fc.textContent='';
 }
@@ -662,8 +664,8 @@ v.querySelector('#ReplaceOriginal').checked=cfg.ReplaceOriginal;
 var hw=cfg.HardwareAcceleration;
 document.getElementById('RenderDeviceField').style.display=(hw==='Vaapi'||hw==='Qsv')?'':'none';
 }).catch(function(e){
-console.error('PreTranscode: config yuklenemedi',e);
-// Default degerlerle doldur
+console.error('PreTranscode: config yüklenemedi',e);
+// Default değerlerle doldur
 var v=document.getElementById('PreTranscodeListPage');
 v.querySelector('#Quality').value=24;
 v.querySelector('#MaxWidth').value=0;
@@ -716,15 +718,15 @@ var ck=el.querySelector('div:first-child');if(ck){ck.style.background='';ck.styl
 ucnt();};
 document.getElementById('EncodeBtn').onclick=function(){
 var ids=Array.from(sel);
-if(!ids.length){Dashboard.alert('En az bir dosya sec.');return;}
-if(!confirm(ids.length+' dosya kuyruga alinsin mi?')) return;
+if(!ids.length){Dashboard.alert('En az bir dosya seç.');return;}
+if(!confirm(ids.length+' dosya kuyruğa alınsin mı?')) return;
 Dashboard.showLoadingMsg();
 ApiClient.ajax({type:'POST',url:ApiClient.getUrl('Plugins/PreTranscode/Encode'),data:JSON.stringify({ItemIds:ids}),contentType:'application/json'})
 .then(function(r){
 Dashboard.hideLoadingMsg();
-var msg=r.queued+' dosya kuyruga alindi.';
+var msg=r.queued+' dosya kuyruğa alındı.';
 if(r.skippedCount>0){
-msg+=' ('+r.skippedCount+' dosya zaten hedef codec\'te, atlandi)';
+msg+=' ('+r.skippedCount+' dosya zaten hedef codec\'te, atlandı)';
 }
 Dashboard.alert(msg);
 if(!jobInterval){jobInterval=setInterval(pollJobs,2000);}
@@ -733,8 +735,8 @@ showTab('j');
 })
 .catch(function(e){
 Dashboard.hideLoadingMsg();
-console.error('Encode hatasi:',e);
-Dashboard.alert('Kodlama baslatilamadi: '+e);
+console.error('Encode hatası:',e);
+Dashboard.alert('Kodlama başlatılamadı: '+e);
 });
 };
 
@@ -745,10 +747,10 @@ sel.clear();
 var count=0;
 (rawItems.Movies||[]).forEach(function(m){if(m.Codec.toLowerCase().includes('hevc')){sel.add(m.Id);count++;}});
 (rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.Codec.toLowerCase().includes('hevc')){sel.add(e.Id);count++;}});});});
-if(count===0){Dashboard.alert('HEVC dosya bulunamadi.');ucnt();return;}
+if(count===0){Dashboard.alert('HEVC dosya bulunamadı.');ucnt();return;}
 // Apply HEVC filter to show selected
 applyFilterSelection('FilterCodec','hevc');
-Dashboard.alert(count+' HEVC dosya secildi. "Secilenleri Kodla" butonuna basin.');
+Dashboard.alert(count+' HEVC dosya seçildi. "Seçilenleri Kodla" butonuna basın.');
 };
 
 document.getElementById('Bulk4kTo1080p').onclick=function(){
@@ -757,9 +759,9 @@ sel.clear();
 var count=0;
 (rawItems.Movies||[]).forEach(function(m){if(m.Resolution==='4K'){sel.add(m.Id);count++;}});
 (rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.Resolution==='4K'){sel.add(e.Id);count++;}});});});
-if(count===0){Dashboard.alert('4K dosya bulunamadi.');ucnt();return;}
+if(count===0){Dashboard.alert('4K dosya bulunamadı.');ucnt();return;}
 applyFilterSelection('FilterRes','4K');
-Dashboard.alert(count+' 4K dosya secildi. "Secilenleri Kodla" butonuna basin.');
+Dashboard.alert(count+' 4K dosya seçildi. "Seçilenleri Kodla" butonuna basın.');
 };
 
 document.getElementById('BulkLargeFiles').onclick=function(){
@@ -768,9 +770,9 @@ sel.clear();
 var count=0;
 (rawItems.Movies||[]).forEach(function(m){if(m.SizeMb>=5120){sel.add(m.Id);count++;}});
 (rawItems.Series||[]).forEach(function(s){(s.Seasons||[]).forEach(function(sn){(sn.Episodes||[]).forEach(function(e){if(e.SizeMb>=5120){sel.add(e.Id);count++;}});});});
-if(count===0){Dashboard.alert('5GB+ dosya bulunamadi.');ucnt();return;}
+if(count===0){Dashboard.alert('5GB+ dosya bulunamadı.');ucnt();return;}
 applyFilterSelection('FilterSize','5120');
-Dashboard.alert(count+' buyuk dosya secildi. "Secilenleri Kodla" butonuna basin.');
+Dashboard.alert(count+' büyük dosya seçildi. "Seçilenleri Kodla" butonuna basın.');
 };
 
 function applyFilterSelection(selectId,value){
