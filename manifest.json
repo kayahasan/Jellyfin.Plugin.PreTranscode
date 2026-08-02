@@ -7,46 +7,42 @@
     "owner": "kayahasan",
     "category": "Library",
     "versions": [
-      {
-        "version": "1.0.0.23",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.23/PreTranscode_1.0.0.23.zip",
-        "checksum": "1D2BE25AA019E7DD1479251FCC254F8F",
-        "changelog": "Bulk selection visual feedback - selected items now show check icon and highlight background",
-        "timestamp": "2026-08-02T23:00:00Z"
-      },
-      {
-        "version": "1.0.0.22",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.22/PreTranscode_1.0.0.22.zip",
-        "checksum": "CBEA9BBA58BB45846109AD7763FE207B",
-        "changelog": "Fixed encode preview dialog, simplified to confirm dialog, includes Activity Log integration",
-        "timestamp": "2026-08-02T22:00:00Z"
-      },
-      {
-        "version": "1.0.0.21",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.21/PreTranscode_1.0.0.21.zip",
-        "checksum": "8291FDD43DCDBFAA2ACDAC544A1562C2",
-        "changelog": "Fixed encode preview dialog, includes Activity Log integration",
-        "timestamp": "2026-08-02T21:00:00Z"
-      },
-      {
-        "version": "1.0.0.20",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.20/PreTranscode_1.0.0.20.zip",
-        "checksum": "8CA4F36A196D605901BA102321412E4F",
-        "changelog": "Activity Log integration - encode complete/fail notifications in Jellyfin Dashboard",
-        "timestamp": "2026-08-02T20:00:00Z"
-      },
-      {
-        "version": "1.0.0.19",
-        "targetAbi": "10.11.11",
-        "sourceUrl": "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.19/PreTranscode_1.0.0.19.zip",
-        "checksum": "95C03AC2D45D0F93EED8C32A77C9C77F",
-        "changelog": "Bulk operations (HEVC→H.264, 4K→1080p, 5GB+), encode preview dialog, show all files (filter in UI), auto-skip target codec at encode time",
-        "timestamp": "2026-08-02T19:00:00Z"
-      }
+      "1.0.0.23",
+      "10.11.11",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.23/PreTranscode_1.0.0.23.zip",
+      "1D2BE25AA019E7DD1479251FCC254F8F",
+      "Bulk selection visual feedback - selected items now show check icon and highlight background",
+      "2026-08-02T23:00:00Z",
+      "1.0.0.22",
+      "10.11.11",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.22/PreTranscode_1.0.0.22.zip",
+      "CBEA9BBA58BB45846109AD7763FE207B",
+      "Fixed encode preview dialog, simplified to confirm dialog, includes Activity Log integration",
+      "2026-08-02T22:00:00Z",
+      "1.0.0.21",
+      "10.11.11",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.21/PreTranscode_1.0.0.21.zip",
+      "8291FDD43DCDBFAA2ACDAC544A1562C2",
+      "Fixed encode preview dialog, includes Activity Log integration",
+      "2026-08-02T21:00:00Z",
+      "1.0.0.20",
+      "10.11.11",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.20/PreTranscode_1.0.0.20.zip",
+      "8CA4F36A196D605901BA102321412E4F",
+      "Activity Log integration - encode complete/fail notifications in Jellyfin Dashboard",
+      "2026-08-02T20:00:00Z",
+      "1.0.0.19",
+      "10.11.11",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.19/PreTranscode_1.0.0.19.zip",
+      "95C03AC2D45D0F93EED8C32A77C9C77F",
+      "Bulk operations (HEVC→H.264, 4K→1080p, 5GB+), encode preview dialog, show all files (filter in UI), auto-skip target codec at encode time",
+      "2026-08-02T19:00:00Z",
+      "1.0.0.24",
+      "52F2E2698FABDFE698435A9134E42EA9",
+      "10.11.0.0",
+      "https://github.com/kayahasan/Jellyfin.Plugin.PreTranscode/releases/download/v1.0.0.24/PreTranscode_1.0.0.24.zip",
+      "52F2E2698FABDFE698435A9134E42EA9",
+      "2026-08-02T20:22:52Z"
     ]
   }
 ]
