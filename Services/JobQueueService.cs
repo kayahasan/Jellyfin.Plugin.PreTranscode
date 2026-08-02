@@ -197,8 +197,6 @@ public class JobQueueService : IDisposable
                 job.ProgressPercent = 100;
                 job.CompletedAt = DateTime.UtcNow;
                 try { job.OutputSizeMb = Math.Round(new FileInfo(outputPath).Length / 1024.0 / 1024.0, 1); } catch { }
-                // Fix permissions - match source directory owner so Sonarr/Radarr can manage it
-                MatchDirectoryPermissions(sourcePath, outputPath);
                 // Activity log - başarı
                 var savedMb = job.SourceSizeMb - job.OutputSizeMb;
                 var savedGb = Math.Round(savedMb / 1024.0, 1);
@@ -285,64 +283,5 @@ public class JobQueueService : IDisposable
         // Use Guid.Empty as system user for plugin activities
         // Jellyfin will show these as system activities
         return Guid.Empty;
-    }
-
-    private void MatchDirectoryPermissions(string sourcePath, string outputPath)
-    {
-        try
-        {
-            var sourceDir = Path.GetDirectoryName(sourcePath);
-            if (string.IsNullOrEmpty(sourceDir)) return;
-
-            // Get source directory's owner UID/GID
-            var statArgs = $"-c 'stat -c \"%u:%g\" \"{sourceDir}\"'";
-            var statCmd = new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "/bin/bash",
-                Arguments = statArgs,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var proc = System.Diagnostics.Process.Start(statCmd))
-            {
-                proc.WaitForExit(5000);
-                if (proc.ExitCode == 0)
-                {
-                    var owner = proc.StandardOutput.ReadToEnd().Trim();
-                    if (!string.IsNullOrEmpty(owner))
-                    {
-                        // Apply to output file
-                        var chownArgs = $"-c 'chown {owner} \"{outputPath}\"'";
-                        var chownCmd = new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = "/bin/bash",
-                            Arguments = chownArgs,
-                            RedirectStandardError = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
-
-                        using (var chownProc = System.Diagnostics.Process.Start(chownCmd))
-                        {
-                            chownProc.WaitForExit(5000);
-                            if (chownProc.ExitCode == 0)
-                            {
-                                _logger.LogInformation("PreTranscode: izinler ayarlandı {Owner} -> {File}", owner, outputPath);
-                            }
-                            else
-                            {
-                                _logger.LogWarning("PreTranscode: chown başarısız: {Error}", chownProc.StandardError.ReadToEnd());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "PreTranscode: izin ayarı başarısız (dosya yine de oluşturuldu)");
-        }
     }
 }

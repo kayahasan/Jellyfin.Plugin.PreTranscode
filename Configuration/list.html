@@ -501,6 +501,25 @@ ucnt();
 return wrap;
 }
 
+function applySelectionVisuals(){
+try{
+document.querySelectorAll('[data-id]').forEach(function(el){
+var id=el.getAttribute('data-id');
+if(!id)return;
+var isSelected=sel.has(id);
+if(isSelected){
+el.style.background='rgba(229,9,20,.12)';
+var ck=el.querySelector('.cardOverlayButton')||el.querySelector('div:first-child');
+if(ck){
+ck.style.background='#e50914';
+ck.style.borderColor='#e50914';
+ck.style.color='#fff';
+}
+}
+});
+}catch(e){console.error('applySelectionVisuals error:',e);}
+}
+
 function render(data){
 try{
 var c=document.getElementById('LibraryContent');
@@ -536,6 +555,9 @@ st2.innerHTML='Diziler <span style="font-size:.85em;padding:.1em .4em;border-rad
 c.appendChild(st2);
 sr.forEach(function(s){c.appendChild(mkSeries(s));});
 }
+
+// Apply selection visuals after render
+applySelectionVisuals();
 }catch(e){
 console.error('PreTranscode render hatasi:',e);
 var c=document.getElementById('LibraryContent');
